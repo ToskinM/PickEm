@@ -12,4 +12,6 @@
     <string name="hamburger_leagues">Leagues</string>
     <string name="title_activity_main">MainActivity</string>
     <string name="title_activity_home">Home</string>
+    <string name="title_activity_people">People</string>
+    <string name="title_activity_settings">Settings</string>
 </resources>
