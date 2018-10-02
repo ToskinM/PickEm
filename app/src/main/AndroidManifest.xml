@@ -12,6 +12,7 @@
         <activity
             android:name=".MainActivity"
             android:label="@string/title_activity_main"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".Home"
@@ -23,6 +24,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".Leagues"
+            android:label="@string/title_activity_leagues"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
         <activity
             android:name=".People"
             android:label="@string/title_activity_people"
