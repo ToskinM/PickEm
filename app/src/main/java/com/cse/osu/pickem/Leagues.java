@@ -1,5 +1,6 @@
 package com.cse.osu.pickem;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -80,18 +81,17 @@ public class Leagues extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
+        if (id == R.id.nav_home) {
+            Intent intent = new Intent(this, Home.class);
+            startActivity(intent);
+        } else if (id == R.id.nav_leagues) {
+            //Already here
+        } else if (id == R.id.nav_people) {
+            Intent intent = new Intent(this, People.class);
+            startActivity(intent);
+        } else if (id == R.id.nav_settings) {
+            Intent intent = new Intent(this, Settings.class);
+            startActivity(intent);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
