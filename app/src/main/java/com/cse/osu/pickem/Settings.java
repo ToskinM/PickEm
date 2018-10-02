@@ -83,12 +83,16 @@ public class Settings extends AppCompatActivity
 
         if (id == R.id.nav_home) {
             Intent intent = new Intent(this, Home.class);
+            startActivity(intent);
         } else if (id == R.id.nav_leagues) {
             Intent intent = new Intent(this, Leagues.class);
+            startActivity(intent);
         } else if (id == R.id.nav_people) {
             Intent intent = new Intent(this, People.class);
+            startActivity(intent);
         } else if (id == R.id.nav_settings) {
             Intent intent = new Intent(this, Settings.class);
+            startActivity(intent);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
