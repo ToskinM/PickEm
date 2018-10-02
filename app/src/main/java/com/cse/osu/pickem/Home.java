@@ -83,7 +83,8 @@ public class Home extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_home) {
-            //Nothing
+            Intent intent = new Intent(this, Home.class);
+            startActivity(intent);
         } else if (id == R.id.nav_leagues) {
             Intent intent = new Intent(this, Leagues.class);
             startActivity(intent);

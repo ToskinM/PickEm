@@ -85,7 +85,8 @@ public class Leagues extends AppCompatActivity
             Intent intent = new Intent(this, Home.class);
             startActivity(intent);
         } else if (id == R.id.nav_leagues) {
-            //Already here
+            Intent intent = new Intent(this, Leagues.class);
+            startActivity(intent);
         } else if (id == R.id.nav_people) {
             Intent intent = new Intent(this, People.class);
             startActivity(intent);
