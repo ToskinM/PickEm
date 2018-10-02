@@ -11,4 +11,5 @@
     <string name="action_Hamburger_Home">Home</string>
     <string name="action_Hamburger_Leagues">Leagues</string>
     <string name="title_activity_main">MainActivity</string>
+    <string name="title_activity_home">Home</string>
 </resources>
