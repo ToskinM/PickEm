@@ -83,7 +83,7 @@ public class Home extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_home) {
-            //Already here
+            //Nothing
         } else if (id == R.id.nav_leagues) {
 
         } else if (id == R.id.nav_people) {
