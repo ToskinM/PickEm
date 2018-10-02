@@ -7,11 +7,11 @@
         <item
             android:id="@+id/nav_home"
             android:icon="@drawable/ic_menu_camera"
-            android:title="@string/action_Hamburger_Home" />
+            android:title="@string/hamburger_home" />
         <item
             android:id="@+id/nav_leagues"
             android:icon="@drawable/ic_menu_gallery"
-            android:title="@string/action_Hamburger_Leagues" />
+            android:title="@string/hamburger_leagues" />
         <item
             android:id="@+id/nav_people"
             android:icon="@drawable/ic_menu_slideshow"
