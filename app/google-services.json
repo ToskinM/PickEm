@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "475425583942",
+    "firebase_url": "https://pick-em-80392.firebaseio.com",
+    "project_id": "pick-em-80392",
+    "storage_bucket": "pick-em-80392.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:475425583942:android:4edf761e336f622f",
+        "android_client_info": {
+          "package_name": "com.cse.osu.pickem"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "475425583942-gu6806vau9sbbsmspo9ibmc3bvpvt94r.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC7-4vrUIUzeEMHC7jYkY9RuazAxcjbjqQ"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
