@@ -14,12 +14,17 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
+
 public class Home extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
 
     public static final String TAG = "PickEm";
+    public Button logoutButton;
+    public FirebaseAuth auth;
 
     @Override
     protected void onDestroy() {
@@ -58,6 +63,9 @@ public class Home extends AppCompatActivity
         setContentView(R.layout.activity_home);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        auth = FirebaseAuth.getInstance();
+        logoutButton = (Button) findViewById(R.id.button_logOut);
+        logoutButton.setOnClickListener(this);
 
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -125,5 +133,15 @@ public class Home extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (v == logoutButton) {
+            auth.signOut();
+            Log.d("PickEm", "Log out pressed!");
+            finish();
+            startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+        }
     }
 }
