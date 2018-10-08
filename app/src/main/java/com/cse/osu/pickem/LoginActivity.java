@@ -16,6 +16,9 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
+import com.google.firebase.auth.FirebaseAuthUserCollisionException;
+import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener{
 
@@ -109,13 +112,27 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             return;
         }
 
+
+
         auth.createUserWithEmailAndPassword(emailText, passwordText).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()) {
-                    Toast.makeText(LoginActivity.this, "Success!", Toast.LENGTH_SHORT);
+                    Toast.makeText(LoginActivity.this, "Success!", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(LoginActivity.this, "Failed!", Toast.LENGTH_SHORT);
+
+                    try {
+                        throw task.getException();
+
+                    } catch (FirebaseAuthWeakPasswordException e) {
+                        Toast.makeText(LoginActivity.this, "Password too weak!", Toast.LENGTH_SHORT).show();
+                    } catch (FirebaseAuthInvalidCredentialsException e) {
+                        Toast.makeText(LoginActivity.this, "Malformed email!", Toast.LENGTH_SHORT).show();
+                    } catch (FirebaseAuthUserCollisionException e) {
+                        Toast.makeText(LoginActivity.this, "User exists already!", Toast.LENGTH_SHORT).show();
+                    } catch (Exception e) {
+                        Toast.makeText(LoginActivity.this, "Unknown error", Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
         });

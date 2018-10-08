@@ -20,11 +20,10 @@ import android.widget.Toast;
 import com.google.firebase.auth.FirebaseAuth;
 
 public class Home extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
+        implements NavigationView.OnNavigationItemSelectedListener {
 
     public static final String TAG = "PickEm";
-    public Button logoutButton;
-    public FirebaseAuth auth;
+    private FirebaseAuth auth;
 
     @Override
     protected void onDestroy() {
@@ -64,8 +63,6 @@ public class Home extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         auth = FirebaseAuth.getInstance();
-        logoutButton = (Button) findViewById(R.id.button_logOut);
-        logoutButton.setOnClickListener(this);
 
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -135,13 +132,4 @@ public class Home extends AppCompatActivity
         return true;
     }
 
-    @Override
-    public void onClick(View v) {
-        if (v == logoutButton) {
-            auth.signOut();
-            Log.d("PickEm", "Log out pressed!");
-            finish();
-            startActivity(new Intent(getApplicationContext(), LoginActivity.class));
-        }
-    }
 }

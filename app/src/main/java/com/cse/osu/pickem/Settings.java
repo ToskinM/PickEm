@@ -2,8 +2,6 @@ package com.cse.osu.pickem;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -14,11 +12,20 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
+import android.graphics.Color;
+import android.widget.Toast;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class Settings extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
 
     public static final String TAG = "PickEm";
+    private Button logoutButton;
+    private Button deleteAccountButton;
+    private FirebaseAuth auth;
 
     @Override
     protected void onDestroy() {
@@ -57,6 +64,15 @@ public class Settings extends AppCompatActivity
         setContentView(R.layout.activity_settings);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        logoutButton = (Button) findViewById(R.id.button_logOut);
+        logoutButton.setOnClickListener(this);
+
+        deleteAccountButton = (Button) findViewById(R.id.button_deleteAccount);
+        deleteAccountButton.setOnClickListener(this);
+        deleteAccountButton.setBackgroundColor(Color.RED);
+
+        auth = FirebaseAuth.getInstance();
 
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -124,5 +140,20 @@ public class Settings extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    public void onClick(View v) throws NullPointerException{
+        if (v == logoutButton) {
+            finish();
+            auth.signOut();
+            startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+        } else if (v == deleteAccountButton) {
+            FirebaseUser user = auth.getCurrentUser();
+            auth.signOut();
+            user.delete();
+
+            startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+        }
     }
 }

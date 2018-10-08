@@ -21,6 +21,7 @@
     <string name="email_editText_login">Enter Email Address</string>
     <string name="password_editText_login">Enter Password</string>
     <string name="button_submit">Submit</string>
+    <string name="button_deleteAccount">Delete account</string>
     <string name="register_header">Register an account</string>
     <string name="button_logIn">Log in</string>
     <string name="button_logOut">Log out</string>

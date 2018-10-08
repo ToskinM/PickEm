@@ -22,11 +22,7 @@
             android:layout_height="wrap_content"
             android:text="@string/title_activity_home" />
 
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/button_logOut"
-            android:text="@string/button_logOut"/>
+
 
     </LinearLayout>
 
