@@ -22,6 +22,30 @@
             android:layout_height="wrap_content"
             android:text="@string/title_activity_home" />
 
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Enter league id"
+            android:id="@+id/league_id_field"/>
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Enter league name"
+            android:id="@+id/league_name_field"/>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Create league"
+            android:id="@+id/buttonCreateLeague"/>
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Test"
+            android:id="@+id/league_name_output"/>
+
 
 
     </LinearLayout>

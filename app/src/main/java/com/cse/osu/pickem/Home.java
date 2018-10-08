@@ -2,10 +2,7 @@ package com.cse.osu.pickem;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.util.Log;
-import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -14,15 +11,26 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 
 public class Home extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     public static final String TAG = "PickEm";
+    private Button createLeagueButton;
+    private DatabaseReference leagues;
+    private EditText leagueIDTextField;
+    private EditText leagueNameTextField;
+    private EditText leagueOutput;
     private FirebaseAuth auth;
 
     @Override
@@ -62,7 +70,6 @@ public class Home extends AppCompatActivity
         setContentView(R.layout.activity_home);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        auth = FirebaseAuth.getInstance();
 
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -73,6 +80,25 @@ public class Home extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        leagues = FirebaseDatabase.getInstance().getReference("leagues");
+        auth = FirebaseAuth.getInstance();
+
+        leagueIDTextField = findViewById(R.id.league_id_field);
+        leagueNameTextField = findViewById(R.id.league_name_field);
+        leagueOutput = findViewById(R.id.league_name_output);
+
+        createLeagueButton = findViewById(R.id.buttonCreateLeague);
+        createLeagueButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String id = leagueIDTextField.getText().toString().trim();
+                String name = leagueNameTextField.getText().toString().trim();
+                leagues.child(id).child("League name").setValue(name);
+                leagues.child(id).child("League owner").setValue(auth.getCurrentUser().getUid());
+                Toast.makeText(Home.this, "League created!", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override
@@ -133,3 +159,4 @@ public class Home extends AppCompatActivity
     }
 
 }
+
