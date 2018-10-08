@@ -2,6 +2,7 @@ package com.cse.osu.pickem;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -18,8 +19,10 @@ import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 
 public class Home extends AppCompatActivity
@@ -32,6 +35,7 @@ public class Home extends AppCompatActivity
     private EditText leagueNameTextField;
     private EditText leagueOutput;
     private FirebaseAuth auth;
+    private League dataChange;
 
     @Override
     protected void onDestroy() {
@@ -80,13 +84,14 @@ public class Home extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
+        leagueOutput = findViewById(R.id.league_name_output);
         leagues = FirebaseDatabase.getInstance().getReference("leagues");
+
         auth = FirebaseAuth.getInstance();
 
         leagueIDTextField = findViewById(R.id.league_id_field);
         leagueNameTextField = findViewById(R.id.league_name_field);
-        leagueOutput = findViewById(R.id.league_name_output);
+
 
         createLeagueButton = findViewById(R.id.buttonCreateLeague);
         createLeagueButton.setOnClickListener(new View.OnClickListener() {
@@ -94,9 +99,22 @@ public class Home extends AppCompatActivity
             public void onClick(View v) {
                 String id = leagueIDTextField.getText().toString().trim();
                 String name = leagueNameTextField.getText().toString().trim();
-                leagues.child(id).child("League name").setValue(name);
-                leagues.child(id).child("League owner").setValue(auth.getCurrentUser().getUid());
-                Toast.makeText(Home.this, "League created!", Toast.LENGTH_SHORT).show();
+                League newLeague = new League(name, id, auth.getCurrentUser().getUid());
+                leagues.child(id).setValue(newLeague);
+
+                Toast.makeText(Home.this, newLeague.getLeagueName(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        leagues.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                dataChange = dataSnapshot.getValue(League.class);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
             }
         });
     }
