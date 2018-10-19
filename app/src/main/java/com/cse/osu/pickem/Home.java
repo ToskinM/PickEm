@@ -3,6 +3,7 @@ package com.cse.osu.pickem;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -18,10 +19,12 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 
@@ -92,6 +95,21 @@ public class Home extends AppCompatActivity
         leagueIDTextField = findViewById(R.id.league_id_field);
         leagueNameTextField = findViewById(R.id.league_name_field);
 
+        leagues.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    League x = snapshot.getValue(League.class);
+                    Log.d("PickEm", "Owner ID: " + x.getLeagueOwnerUID());
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
 
         createLeagueButton = findViewById(R.id.buttonCreateLeague);
         createLeagueButton.setOnClickListener(new View.OnClickListener() {
@@ -102,21 +120,12 @@ public class Home extends AppCompatActivity
                 League newLeague = new League(name, id, auth.getCurrentUser().getUid());
                 leagues.child(id).setValue(newLeague);
 
+
                 Toast.makeText(Home.this, newLeague.getLeagueName(), Toast.LENGTH_SHORT).show();
             }
         });
 
-        leagues.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                dataChange = dataSnapshot.getValue(League.class);
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
     }
 
     @Override
