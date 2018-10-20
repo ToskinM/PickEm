@@ -15,13 +15,25 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class Leagues extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     public static final String TAG = "PickEm";
+
+
+    private EditText leagueIDTextField;
+    private EditText leagueNameTextField;
+    private EditText leagueOutput;
+    private Button createLeagueButton;
+    private DatabaseReference leagues;
+    private FirebaseAuth auth;
 
     @Override
     protected void onDestroy() {
@@ -61,6 +73,12 @@ public class Leagues extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        auth = FirebaseAuth.getInstance();
+        leagues = FirebaseDatabase.getInstance().getReference("leagues");
+
+        leagueIDTextField = findViewById(R.id.league_id_field);
+        leagueNameTextField = findViewById(R.id.league_name_field);
+
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -70,6 +88,20 @@ public class Leagues extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        createLeagueButton = findViewById(R.id.buttonCreateLeague);
+        createLeagueButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String id = leagueIDTextField.getText().toString().trim();
+                String name = leagueNameTextField.getText().toString().trim();
+                League newLeague = new League(name, id, auth.getCurrentUser().getUid());
+                leagues.child(id).setValue(newLeague);
+
+
+                Toast.makeText(Leagues.this, newLeague.getLeagueName(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override

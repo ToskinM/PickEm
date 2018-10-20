@@ -32,13 +32,7 @@ public class Home extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     public static final String TAG = "PickEm";
-    private Button createLeagueButton;
-    private DatabaseReference leagues;
-    private EditText leagueIDTextField;
-    private EditText leagueNameTextField;
-    private EditText leagueOutput;
-    private FirebaseAuth auth;
-    private League dataChange;
+
 
     @Override
     protected void onDestroy() {
@@ -87,43 +81,13 @@ public class Home extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-        leagueOutput = findViewById(R.id.league_name_output);
-        leagues = FirebaseDatabase.getInstance().getReference("leagues");
-
-        auth = FirebaseAuth.getInstance();
-
-        leagueIDTextField = findViewById(R.id.league_id_field);
-        leagueNameTextField = findViewById(R.id.league_name_field);
-
-        leagues.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    League x = snapshot.getValue(League.class);
-                    Log.d("PickEm", "Owner ID: " + x.getLeagueOwnerUID());
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
 
 
-        createLeagueButton = findViewById(R.id.buttonCreateLeague);
-        createLeagueButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String id = leagueIDTextField.getText().toString().trim();
-                String name = leagueNameTextField.getText().toString().trim();
-                League newLeague = new League(name, id, auth.getCurrentUser().getUid());
-                leagues.child(id).setValue(newLeague);
 
 
-                Toast.makeText(Home.this, newLeague.getLeagueName(), Toast.LENGTH_SHORT).show();
-            }
-        });
+
+
+
 
 
     }
