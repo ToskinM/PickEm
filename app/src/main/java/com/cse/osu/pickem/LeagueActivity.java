@@ -30,7 +30,7 @@ public class LeagueActivity extends AppCompatActivity
     private EditText leagueNameTextField;
     private EditText leagueOutput;
     private Button createLeagueButton;
-    private DatabaseReference leagues;
+    private DatabaseReference leaguesDatabaseReference;
     private FirebaseAuth auth;
 
     @Override
@@ -63,6 +63,25 @@ public class LeagueActivity extends AppCompatActivity
         Log.d(TAG, "LeagueActivity: onPause() called!");
     }
 
+    private void setUpLeagueCreation(Bundle savedInstanceState) {
+        leagueIDTextField = findViewById(R.id.league_name_field);
+        leagueNameTextField = findViewById(R.id.league_name_field);
+
+        createLeagueButton = findViewById(R.id.buttonCreateLeague);
+        createLeagueButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String id = leagueIDTextField.getText().toString().trim();
+                String name = leagueNameTextField.getText().toString().trim();
+                League newLeague = new League(name, id, auth.getCurrentUser().getUid());
+                leaguesDatabaseReference.child(id).setValue(newLeague);
+
+
+                Toast.makeText(LeagueActivity.this, newLeague.getLeagueName(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,10 +91,7 @@ public class LeagueActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         auth = FirebaseAuth.getInstance();
-        leagues = FirebaseDatabase.getInstance().getReference("leagues");
-
-        leagueIDTextField = findViewById(R.id.league_id_field);
-        leagueNameTextField = findViewById(R.id.league_name_field);
+        leaguesDatabaseReference = FirebaseDatabase.getInstance().getReference("leagues");
 
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -87,19 +103,9 @@ public class LeagueActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        createLeagueButton = findViewById(R.id.buttonCreateLeague);
-        createLeagueButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String id = leagueIDTextField.getText().toString().trim();
-                String name = leagueNameTextField.getText().toString().trim();
-                League newLeague = new League(name, id, auth.getCurrentUser().getUid());
-                leagues.child(id).setValue(newLeague);
+        setUpLeagueCreation(savedInstanceState);
 
 
-                Toast.makeText(LeagueActivity.this, newLeague.getLeagueName(), Toast.LENGTH_SHORT).show();
-            }
-        });
     }
 
     @Override
