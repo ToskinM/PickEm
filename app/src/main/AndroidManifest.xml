@@ -20,7 +20,7 @@
 
         </activity>
         <activity
-            android:name=".Leagues"
+            android:name=".LeagueActivity"
             android:label="@string/title_activity_leagues"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity

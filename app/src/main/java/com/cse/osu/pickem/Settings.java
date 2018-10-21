@@ -14,7 +14,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.graphics.Color;
-import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -127,7 +126,7 @@ public class Settings extends AppCompatActivity
             Intent intent = new Intent(this, Home.class);
             startActivity(intent);
         } else if (id == R.id.nav_leagues) {
-            Intent intent = new Intent(this, Leagues.class);
+            Intent intent = new Intent(this, LeagueActivity.class);
             startActivity(intent);
         } else if (id == R.id.nav_people) {
             Intent intent = new Intent(this, People.class);
