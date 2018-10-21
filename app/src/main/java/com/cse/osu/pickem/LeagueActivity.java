@@ -2,8 +2,6 @@ package com.cse.osu.pickem;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -22,7 +20,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-public class Leagues extends AppCompatActivity
+public class LeagueActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     public static final String TAG = "PickEm";
@@ -38,37 +36,37 @@ public class Leagues extends AppCompatActivity
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.d(TAG, "Leagues: onDestroy() called!");
+        Log.d(TAG, "LeagueActivity: onDestroy() called!");
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        Log.d(TAG, "Leagues: onResume() called!");
+        Log.d(TAG, "LeagueActivity: onResume() called!");
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        Log.d(TAG, "Leagues: onStart() called!");
+        Log.d(TAG, "LeagueActivity: onStart() called!");
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        Log.d(TAG, "Leagues: onStop() called!");
+        Log.d(TAG, "LeagueActivity: onStop() called!");
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        Log.d(TAG, "Leagues: onPause() called!");
+        Log.d(TAG, "LeagueActivity: onPause() called!");
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(TAG, "Leagues: onCreate() called!");
+        Log.d(TAG, "LeagueActivity: onCreate() called!");
         setContentView(R.layout.activity_leagues);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -99,7 +97,7 @@ public class Leagues extends AppCompatActivity
                 leagues.child(id).setValue(newLeague);
 
 
-                Toast.makeText(Leagues.this, newLeague.getLeagueName(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(LeagueActivity.this, newLeague.getLeagueName(), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -146,7 +144,7 @@ public class Leagues extends AppCompatActivity
             Intent intent = new Intent(this, Home.class);
             startActivity(intent);
         } else if (id == R.id.nav_leagues) {
-            Intent intent = new Intent(this, Leagues.class);
+            Intent intent = new Intent(this, LeagueActivity.class);
             startActivity(intent);
         } else if (id == R.id.nav_people) {
             Intent intent = new Intent(this, People.class);
