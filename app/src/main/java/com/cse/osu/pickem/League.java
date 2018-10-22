@@ -16,6 +16,18 @@ public class League {
 
     }
 
+    public void setLeagueName(String leagueName) {
+        this.leagueName = leagueName;
+    }
+
+    public void setLeagueID(String leagueID) {
+        this.leagueID = leagueID;
+    }
+
+    public void setLeagueOwnerUID(String leagueOwnerUID) {
+        this.leagueOwnerUID = leagueOwnerUID;
+    }
+
     public String getLeagueName() {
         return leagueName;
     }
