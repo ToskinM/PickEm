@@ -2,6 +2,8 @@ package com.cse.osu.pickem;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.ContactsContract;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -17,8 +19,16 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class LeagueActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -30,8 +40,14 @@ public class LeagueActivity extends AppCompatActivity
     private EditText leagueNameTextField;
     private EditText leagueOutput;
     private Button createLeagueButton;
+    private Button joinLeagueButton;
     private DatabaseReference leaguesDatabaseReference;
+    private DatabaseReference leagueMemberDatabaseReference;
     private FirebaseAuth auth;
+
+    private List<League> loadedLeagues = new ArrayList<>();
+    private Set<LeagueMemberPair> loadedLeagueMemberPairs = new HashSet<LeagueMemberPair>();
+
 
     @Override
     protected void onDestroy() {
@@ -63,9 +79,34 @@ public class LeagueActivity extends AppCompatActivity
         Log.d(TAG, "LeagueActivity: onPause() called!");
     }
 
-    private void setUpLeagueCreation(Bundle savedInstanceState) {
-        leagueIDTextField = findViewById(R.id.league_name_field);
+    private void setUp(Bundle savedInstanceState) {
+        leagueIDTextField = findViewById(R.id.league_id_field);
         leagueNameTextField = findViewById(R.id.league_name_field);
+
+        joinLeagueButton = findViewById(R.id.buttonJoinLeague);
+        joinLeagueButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                leagueNameTextField.setText(""); //Clear text in league name
+                boolean okToAdd = false;
+                for (League league : loadedLeagues) {
+                    if (league.getLeagueID().equals(leagueIDTextField.getText().toString().trim())) {
+                        okToAdd = true;
+                    }
+                }
+
+                for(LeagueMemberPair pair : loadedLeagueMemberPairs) {
+                    if (pair.getUID().equals(auth.getUid()) && pair.getLeagueID().equals(leagueIDTextField.getText().toString().trim())) {
+                        okToAdd = false;
+                    }
+                }
+
+                if (okToAdd) {
+                    leagueMemberDatabaseReference.push().setValue(new LeagueMemberPair(auth.getUid(), leagueIDTextField.getText().toString()));
+                }
+            }
+        });
 
         createLeagueButton = findViewById(R.id.buttonCreateLeague);
         createLeagueButton.setOnClickListener(new View.OnClickListener() {
@@ -92,6 +133,45 @@ public class LeagueActivity extends AppCompatActivity
 
         auth = FirebaseAuth.getInstance();
         leaguesDatabaseReference = FirebaseDatabase.getInstance().getReference("leagues");
+        leagueMemberDatabaseReference = FirebaseDatabase.getInstance().getReference("leagueMembers");
+
+
+        leagueMemberDatabaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for(DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    loadedLeagueMemberPairs.clear();
+                    LeagueMemberPair tempPair = snapshot.getValue(LeagueMemberPair.class);
+                    if (!loadedLeagueMemberPairs.contains(tempPair)) {
+                        loadedLeagueMemberPairs.add(tempPair);
+                    }
+
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+        leaguesDatabaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+
+                loadedLeagues.clear();
+                for (DataSnapshot data : dataSnapshot.getChildren()) {
+                    loadedLeagues.add(data.getValue(League.class));
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.d("PickEm", "ON CANCELLED!");
+            }
+        });
 
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -103,7 +183,7 @@ public class LeagueActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        setUpLeagueCreation(savedInstanceState);
+        setUp(savedInstanceState);
 
 
     }

@@ -40,6 +40,12 @@ tools:showIn="@layout/app_bar_leagues">
         android:text="Create league"
         android:id="@+id/buttonCreateLeague"/>
 
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Join League"
+        android:id="@+id/buttonJoinLeague"/>
+
 
 
 

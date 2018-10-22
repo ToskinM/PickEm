@@ -68,13 +68,6 @@ public class Home extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
 
-
-
-
-
-
-
-
     }
 
     @Override
