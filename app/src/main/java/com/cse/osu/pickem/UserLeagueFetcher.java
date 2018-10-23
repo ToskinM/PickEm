@@ -22,6 +22,7 @@ public class UserLeagueFetcher {
     private DatabaseReference leaguesDatabaseReference;
     private DatabaseReference leagueMemberDatabaseReference;
     private Set<LeagueMemberPair> loadedLeagueMemberPairs;
+    private FirebaseAuth auth;
 
     // List of leagues to be sent to recycler view
     private List<League> mLeagues;
@@ -35,10 +36,27 @@ public class UserLeagueFetcher {
     }
 
     private UserLeagueFetcher(Context context, final FirebaseAuth auth) {
+        this.auth = auth;
+        updateLeagues();
+    }
+
+    public List<League> getLeagues() {
+        return mLeagues;
+    }
+
+    public League getLeague(String leagueID) {
+        for (League league : mLeagues) {
+            if (league.getLeagueID().equals(leagueID)) {
+                return league;
+            }
+        }
+
+        return null;
+    }
+
+    public void updateLeagues(){
         mLeagues = new ArrayList<>();
         loadedLeagueMemberPairs = new HashSet<LeagueMemberPair>();
-
-        // Get league-member pairs
         leaguesDatabaseReference = FirebaseDatabase.getInstance().getReference("leagues");
         leaguesDatabaseReference.addValueEventListener(new ValueEventListener() {
             @Override
@@ -57,19 +75,5 @@ public class UserLeagueFetcher {
             public void onCancelled(@NonNull DatabaseError databaseError) {
             }
         });
-    }
-
-    public List<League> getLeagues() {
-        return mLeagues;
-    }
-
-    public League getLeague(String leagueID) {
-        for (League league : mLeagues) {
-            if (league.getLeagueID().equals(leagueID)) {
-                return league;
-            }
-        }
-
-        return null;
     }
 }

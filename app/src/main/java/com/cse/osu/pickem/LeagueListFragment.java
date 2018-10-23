@@ -1,10 +1,13 @@
 package com.cse.osu.pickem;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -15,14 +18,25 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.List;
 
 public class LeagueListFragment extends Fragment {
     public static final String TAG = "LeagueListFragment";
     private RecyclerView mLeagueRecyclerView;
+    private DatabaseReference leaguesDatabaseReference;
     private LeagueAdapter mAdapter;
     private FirebaseAuth auth;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -36,18 +50,57 @@ public class LeagueListFragment extends Fragment {
         mLeagueRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         // Update the list
-        updateUI();
+        leaguesDatabaseReference = FirebaseDatabase.getInstance().getReference("leagues");
+        leaguesDatabaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                updateUI();
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+            }
+        });
 
         return view;
     }
 
+        @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+    }
+
     private void updateUI() {
-        // Get user's leagues
+        // Get user's owned leagues
         UserLeagueFetcher userLeagueFetcher = UserLeagueFetcher.get(getActivity(), auth);
+        userLeagueFetcher.updateLeagues();
         List<League> leagues = userLeagueFetcher.getLeagues();
 
         mAdapter = new LeagueAdapter(leagues);
+        mLeagueRecyclerView.removeAllViews();
+        mAdapter.notifyDataSetChanged();
         mLeagueRecyclerView.setAdapter(mAdapter);
+    }
+    private void showPopup() {
+        PopupMenu popupMenu = new PopupMenu(getActivity(), getView());
+        popupMenu.getMenuInflater().inflate(R.menu.popup_menu_leagues, popupMenu.getMenu());
+        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                int id = item.getItemId();
+                if (id == R.id.action_delete_league) {
+                    Toast.makeText(getActivity(),
+                            "Not yet Implemented", Toast.LENGTH_SHORT)
+                            .show();
+                } else if (id == R.id.action_delete_league) {
+                }
+                return true;
+            }
+        });
     }
 
     private class LeagueHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
@@ -69,21 +122,7 @@ public class LeagueListFragment extends Fragment {
             Toast.makeText(getActivity(),
                     "Owned by: " + mLeague.getLeagueOwnerUID(), Toast.LENGTH_SHORT)
                     .show();
-            PopupMenu popupMenu = new PopupMenu(getActivity(), getView());
-            popupMenu.getMenuInflater().inflate(R.menu.popup_menu_leagues, popupMenu.getMenu());
-            popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                @Override
-                public boolean onMenuItemClick(MenuItem item) {
-                    int id = item.getItemId();
-                    if (id == R.id.action_delete_league) {
-                        Toast.makeText(getActivity(),
-                                "Not yet Implemented", Toast.LENGTH_SHORT)
-                                .show();
-                    } else if (id == R.id.action_delete_league) {
-                    }
-                    return true;
-                }
-            });
+            showPopup();
         }
     }
 

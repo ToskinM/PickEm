@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -86,6 +87,26 @@ public class LeagueActivity extends AppCompatActivity
         leagueIDTextField = findViewById(R.id.league_id_field);
         leagueNameTextField = findViewById(R.id.league_name_field);
 
+        // League Creation
+        createLeagueButton = findViewById(R.id.buttonCreateLeague);
+        createLeagueButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String id = leagueIDTextField.getText().toString().trim();
+                if (!id.equals("")) {
+                    String name = leagueNameTextField.getText().toString().trim();
+                    League newLeague = new League(name, id, auth.getCurrentUser().getUid());
+                    leaguesDatabaseReference.child(id).setValue(newLeague);
+                    Toast.makeText(LeagueActivity.this, newLeague.getLeagueName(), Toast.LENGTH_SHORT).show();
+                } else {
+                    AlertDialog alertDialog = new AlertDialog.Builder(LeagueActivity.this).create();
+                    alertDialog.setMessage("LeagueID cannot be empty!");
+                    alertDialog.show();
+                }
+            }
+        });
+
+        // League Join
         joinLeagueButton = findViewById(R.id.buttonJoinLeague);
         joinLeagueButton.setOnClickListener(new View.OnClickListener() {
 
@@ -114,20 +135,7 @@ public class LeagueActivity extends AppCompatActivity
             }
         });
 
-        createLeagueButton = findViewById(R.id.buttonCreateLeague);
-        createLeagueButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String id = leagueIDTextField.getText().toString().trim();
-                String name = leagueNameTextField.getText().toString().trim();
-                League newLeague = new League(name, id, auth.getCurrentUser().getUid());
-                leaguesDatabaseReference.child(id).setValue(newLeague);
-
-
-                Toast.makeText(LeagueActivity.this, newLeague.getLeagueName(), Toast.LENGTH_SHORT).show();
-            }
-        });
-
+        // Have yourLeaguesTextView display user's id
         yourLeaguesTextView = findViewById(R.id.yourLeaguesTextView);
         yourLeaguesTextView.setText("Your UID: " + auth.getUid());
     }
@@ -177,8 +185,6 @@ public class LeagueActivity extends AppCompatActivity
         leaguesDatabaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-
                 loadedLeagues.clear();
                 for (DataSnapshot data : dataSnapshot.getChildren()) {
                     loadedLeagues.add(data.getValue(League.class));
