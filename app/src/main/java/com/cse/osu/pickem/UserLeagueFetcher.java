@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -14,38 +15,46 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
-public class LeagueListerSingleton {
-    private static LeagueListerSingleton sLeagueListerSingleton;
+public class UserLeagueFetcher {
+    public static final String TAG = "LeagueFetcher";
+    private static UserLeagueFetcher sUserLeagueFetcher;
     private DatabaseReference leaguesDatabaseReference;
     private DatabaseReference leagueMemberDatabaseReference;
+    private Set<LeagueMemberPair> loadedLeagueMemberPairs;
+
+    // List of leagues to be sent to recycler view
     private List<League> mLeagues;
 
 
-    public static LeagueListerSingleton get(Context context) {
-        if (sLeagueListerSingleton == null) {
-            sLeagueListerSingleton = new LeagueListerSingleton(context);
+    public static UserLeagueFetcher get(Context context, FirebaseAuth auth) {
+        if (sUserLeagueFetcher == null) {
+            sUserLeagueFetcher = new UserLeagueFetcher(context, auth);
         }
-        return sLeagueListerSingleton;
+        return sUserLeagueFetcher;
     }
 
-    private LeagueListerSingleton(Context context) {
+    private UserLeagueFetcher(Context context, final FirebaseAuth auth) {
         mLeagues = new ArrayList<>();
+        loadedLeagueMemberPairs = new HashSet<LeagueMemberPair>();
 
+        // Get league-member pairs
         leaguesDatabaseReference = FirebaseDatabase.getInstance().getReference("leagues");
-        leagueMemberDatabaseReference = FirebaseDatabase.getInstance().getReference("leagueMembers");
         leaguesDatabaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                mLeagues.clear();
-                for (DataSnapshot data : dataSnapshot.getChildren()) {
-                    mLeagues.add(data.getValue(League.class));
+                Log.d(TAG, "Database Snapshot Taken, " + dataSnapshot.getChildrenCount() + " leagues found.\n");
+                for(DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    League tempLeague = snapshot.getValue(League.class);
+                    Log.d(TAG, "\tLeagueID: " + tempLeague.getLeagueID() + "\tLeagueName: " + tempLeague.getLeagueName() + "\tLeagueOwner: " + tempLeague.getLeagueOwnerUID() + "\n");
+                    if (tempLeague.getLeagueOwnerUID().equals(auth.getUid())){
+                        mLeagues.add(snapshot.getValue(League.class));
+                        Log.d(TAG, "\t\tCurrent User owns this league; added to list.\n");
+                    }
                 }
             }
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-                Log.d("PickEm", "ON CANCELLED!");
             }
         });
     }

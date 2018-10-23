@@ -15,7 +15,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 
-public class Home extends AppCompatActivity
+public class HomeActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     public static final String TAG = "PickEm";
@@ -24,37 +24,37 @@ public class Home extends AppCompatActivity
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.d(TAG, "Home: onDestroy() called!");
+        Log.d(TAG, "HomeActivity: onDestroy() called!");
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        Log.d(TAG, "Home: onResume() called!");
+        Log.d(TAG, "HomeActivity: onResume() called!");
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        Log.d(TAG, "Home: onStart() called!");
+        Log.d(TAG, "HomeActivity: onStart() called!");
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        Log.d(TAG, "Home: onStop() called!");
+        Log.d(TAG, "HomeActivity: onStop() called!");
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        Log.d(TAG, "Home: onPause() called!");
+        Log.d(TAG, "HomeActivity: onPause() called!");
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(TAG, "Home: onCreate() called!");
+        Log.d(TAG, "HomeActivity: onCreate() called!");
         setContentView(R.layout.activity_home);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -102,7 +102,7 @@ public class Home extends AppCompatActivity
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
+        // automatically handle clicks on the HomeActivity/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
@@ -121,7 +121,7 @@ public class Home extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_home) {
-            Intent intent = new Intent(this, Home.class);
+            Intent intent = new Intent(this, HomeActivity.class);
             startActivity(intent);
         } else if (id == R.id.nav_leagues) {
             Intent intent = new Intent(this, LeagueActivity.class);

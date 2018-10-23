@@ -2,8 +2,9 @@ package com.cse.osu.pickem;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -16,6 +17,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -39,6 +41,7 @@ public class LeagueActivity extends AppCompatActivity
     private EditText leagueIDTextField;
     private EditText leagueNameTextField;
     private EditText leagueOutput;
+    private TextView yourLeaguesTextView;
     private Button createLeagueButton;
     private Button joinLeagueButton;
     private DatabaseReference leaguesDatabaseReference;
@@ -121,6 +124,9 @@ public class LeagueActivity extends AppCompatActivity
                 Toast.makeText(LeagueActivity.this, newLeague.getLeagueName(), Toast.LENGTH_SHORT).show();
             }
         });
+
+        yourLeaguesTextView = findViewById(R.id.yourLeaguesTextView);
+        yourLeaguesTextView.setText("Your UID: " + auth.getUid());
     }
 
     @Override
@@ -132,6 +138,17 @@ public class LeagueActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         auth = FirebaseAuth.getInstance();
+
+        // Create league RecyclerView Fragment
+        FragmentManager fm = getSupportFragmentManager();
+        Fragment fragment = fm.findFragmentById(R.id.fragment_container);
+        if (fragment == null) {
+            fragment = new LeagueListFragment();
+            fm.beginTransaction()
+                    .add(R.id.fragment_container, fragment)
+                    .commit();
+        }
+
         leaguesDatabaseReference = FirebaseDatabase.getInstance().getReference("leagues");
         leagueMemberDatabaseReference = FirebaseDatabase.getInstance().getReference("leagueMembers");
 
@@ -145,8 +162,6 @@ public class LeagueActivity extends AppCompatActivity
                     if (!loadedLeagueMemberPairs.contains(tempPair)) {
                         loadedLeagueMemberPairs.add(tempPair);
                     }
-
-
                 }
             }
 
@@ -183,9 +198,9 @@ public class LeagueActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+
+
         setUp(savedInstanceState);
-
-
     }
 
     @Override
@@ -208,7 +223,7 @@ public class LeagueActivity extends AppCompatActivity
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
+        // automatically handle clicks on the HomeActivity/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
@@ -227,7 +242,7 @@ public class LeagueActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_home) {
-            Intent intent = new Intent(this, Home.class);
+            Intent intent = new Intent(this, HomeActivity.class);
             startActivity(intent);
         } else if (id == R.id.nav_leagues) {
             Intent intent = new Intent(this, LeagueActivity.class);
