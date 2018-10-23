@@ -16,6 +16,22 @@ public class League {
 
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (!(o instanceof League)) {
+            return false;
+        }
+        League compareLeague = (League)o;
+        if (this.leagueID != compareLeague.getLeagueID() || this.leagueName != compareLeague.getLeagueName() || this.leagueOwnerUID != compareLeague.getLeagueOwnerUID()) {
+            return false;
+        }
+        return true;
+    }
+
     public void setLeagueName(String leagueName) {
         this.leagueName = leagueName;
     }

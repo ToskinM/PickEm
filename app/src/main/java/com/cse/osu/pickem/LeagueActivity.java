@@ -92,21 +92,24 @@ public class LeagueActivity extends AppCompatActivity
             @Override
             public void onClick(View v) {
                 leagueNameTextField.setText(""); //Clear text in league name
+                LeagueMemberPair pairToAdd = new LeagueMemberPair(auth.getUid(), leagueIDTextField.getText().toString().trim());
                 boolean okToAdd = false;
+
                 for (League league : loadedLeagues) {
                     if (league.getLeagueID().equals(leagueIDTextField.getText().toString().trim())) {
                         okToAdd = true;
                     }
                 }
 
-                for(LeagueMemberPair pair : loadedLeagueMemberPairs) {
-                    if (pair.getUID().equals(auth.getUid()) && pair.getLeagueID().equals(leagueIDTextField.getText().toString().trim())) {
+                for (LeagueMemberPair testPair : loadedLeagueMemberPairs) {
+                    if (testPair.equals(pairToAdd)) {
+                        Log.d("PickEm", "Already exists in thing");
                         okToAdd = false;
                     }
                 }
 
                 if (okToAdd) {
-                    leagueMemberDatabaseReference.push().setValue(new LeagueMemberPair(auth.getUid(), leagueIDTextField.getText().toString()));
+                    leagueMemberDatabaseReference.push().setValue(pairToAdd);
                 }
             }
         });

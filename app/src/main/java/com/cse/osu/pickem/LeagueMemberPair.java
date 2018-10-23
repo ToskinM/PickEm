@@ -29,7 +29,7 @@ public class LeagueMemberPair {
             return false;
         }
 
-        return false;
+        return true;
     }
 
     public String getUID() {
