@@ -60,11 +60,7 @@ public class LeagueActivity extends AppCompatActivity
     private Set<LeagueMemberPair> loadedLeagueMemberPairs = new HashSet<LeagueMemberPair>();
 
 
-
-    private void setUp(Bundle savedInstanceState) {
-        leagueIDTextField = findViewById(R.id.league_id_field);
-        leagueNameTextField = findViewById(R.id.league_name_field);
-
+    private void handleCreateLeagueButton() {
         // League Creation
         createLeagueButton = findViewById(R.id.buttonCreateLeague);
         createLeagueButton.setOnClickListener(new View.OnClickListener() {
@@ -73,17 +69,21 @@ public class LeagueActivity extends AppCompatActivity
                 String id = leagueIDTextField.getText().toString().trim();
                 if (!id.equals("")) {
                     String name = leagueNameTextField.getText().toString().trim();
+                    //Set up new league, and add it to firebase
                     League newLeague = new League(name, id, auth.getCurrentUser().getUid());
                     leaguesDatabaseReference.child(id).setValue(newLeague);
                     Toast.makeText(LeagueActivity.this, newLeague.getLeagueName(), Toast.LENGTH_SHORT).show();
                 } else {
+                    //Error handling
                     AlertDialog alertDialog = new AlertDialog.Builder(LeagueActivity.this).create();
                     alertDialog.setMessage("LeagueID cannot be empty!");
                     alertDialog.show();
                 }
             }
         });
+    }
 
+    private void handleJoinLeagueButton() {
         // League Join
         joinLeagueButton = findViewById(R.id.buttonJoinLeague);
         joinLeagueButton.setOnClickListener(new View.OnClickListener() {
@@ -94,12 +94,14 @@ public class LeagueActivity extends AppCompatActivity
                 LeagueMemberPair pairToAdd = new LeagueMemberPair(auth.getUid(), leagueIDTextField.getText().toString().trim());
                 boolean okToAdd = false;
 
+                //Ensure league exists
                 for (League league : loadedLeagues) {
                     if (league.getLeagueID().equals(leagueIDTextField.getText().toString().trim())) {
                         okToAdd = true;
                     }
                 }
 
+                //Ensure user isn't already a member of the league
                 for (LeagueMemberPair testPair : loadedLeagueMemberPairs) {
                     if (testPair.equals(pairToAdd)) {
                         Log.d("PickEm", "Already exists in thing");
@@ -107,26 +109,36 @@ public class LeagueActivity extends AppCompatActivity
                     }
                 }
 
+                //Passes all tests, add new league pair
                 if (okToAdd) {
                     leagueMemberDatabaseReference.push().setValue(pairToAdd);
                 }
             }
         });
+    }
 
+    private void handleDeleteLeagueButton() {
         deleteLeagueButton = findViewById(R.id.buttonDeleteLeague);
         deleteLeagueButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                //Need to access firebase, set up listener
                 leaguesDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
 
+                            //Get the current league on firebase we are looking at
                             League snapshotLeague = snapshot.getValue(League.class);
                             String leagueID = leagueIDTextField.getText().toString().trim();
 
+                            //If current user owns the league, and the league is the target league,
                             if (snapshotLeague.getLeagueOwnerUID().equals(auth.getUid()) && snapshotLeague.getLeagueID().equals(leagueID)) {
+
+                                //Delete all of the league member pairs related to the target league
+                                deleteLeagueMembers(snapshotLeague.getLeagueID());
+
+                                //Delete league.
                                 leaguesDatabaseReference.child(leagueID).removeValue(new DatabaseReference.CompletionListener() {
                                     @Override
                                     public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
@@ -147,15 +159,22 @@ public class LeagueActivity extends AppCompatActivity
 
             }
         });
+    }
 
+    private void handleRenameLeagueButton() {
         renameLeagueButton = findViewById(R.id.buttonRenameLeague);
         renameLeagueButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                renameLeague(leagueIDTextField.getText().toString().trim(), leagueNameTextField.getText().toString().trim());
+                String leagueIDText = leagueIDTextField.getText().toString().trim();
+                String leagueNameText = leagueNameTextField.getText().toString().trim();
+
+                renameLeague(leagueIDText, leagueNameText);
             }
         });
+    }
 
+    private void handleLeaveLeagueButton() {
         leaveLeagueButton = findViewById(R.id.buttonLeaveLeague);
         leaveLeagueButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -165,20 +184,23 @@ public class LeagueActivity extends AppCompatActivity
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
+                        String currentUserID = auth.getUid();
+                        String enteredLeagueID = leagueIDTextField.getText().toString().trim();
+                        LeagueMemberPair currentPair = new LeagueMemberPair(currentUserID, enteredLeagueID);
+
                         for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
 
-                            String currentUserID = auth.getUid();
-                            String enteredLeagueID = leagueIDTextField.getText().toString().trim();
-
+                            //Get info about the league on firebase currently being examined
                             String snapshotUserID = snapshot.getValue(LeagueMemberPair.class).getUID();
                             String snapshotLeagueID = snapshot.getValue(LeagueMemberPair.class).getLeagueID();
 
-
-                            LeagueMemberPair currentPair = new LeagueMemberPair(currentUserID, enteredLeagueID);
+                            //Create actual league member pair for firebase league
                             LeagueMemberPair snapshotPair = new LeagueMemberPair(snapshotUserID, snapshotLeagueID);
 
-
+                            //If the current pair (userId/text field) matches the pair on firebase,
                             if (snapshotPair.equals(currentPair)) {
+
+                                //Remove the league member pair, leaving the league.
                                 snapshot.getRef().removeValue(new DatabaseReference.CompletionListener() {
                                     @Override
                                     public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
@@ -196,6 +218,19 @@ public class LeagueActivity extends AppCompatActivity
                 });
             }
         });
+    }
+
+
+
+    private void setUp(Bundle savedInstanceState) {
+        leagueIDTextField = findViewById(R.id.league_id_field);
+        leagueNameTextField = findViewById(R.id.league_name_field);
+
+        handleCreateLeagueButton();
+        handleDeleteLeagueButton();
+        handleRenameLeagueButton();
+        handleJoinLeagueButton();
+        handleLeaveLeagueButton();
 
         // Have yourLeaguesTextView display user's id
         yourLeaguesTextView = findViewById(R.id.yourLeaguesTextView);
@@ -209,9 +244,16 @@ public class LeagueActivity extends AppCompatActivity
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     League snapshotLeague = snapshot.getValue(League.class);
 
+                    //If current user owns the league, and the league being examined is the target,
                     if (snapshotLeague.getLeagueOwnerUID().equals(auth.getUid()) && snapshotLeague.getLeagueID().equals(leagueID)) {
+
+                        //Create a new map to pass into updateChildren()
                         Map<String, Object> childrenMap = new HashMap<>();
+
+                        //Add the league we want to change as the key, and the new League as the value
                         childrenMap.put(snapshotLeague.getLeagueID(), new League(newName, snapshotLeague.getLeagueID(), snapshotLeague.getLeagueOwnerUID()));
+
+                        //Now actually update
                         snapshot.getRef().getParent().updateChildren(childrenMap);
                     }
                 }
@@ -295,6 +337,37 @@ public class LeagueActivity extends AppCompatActivity
 
         setUp(savedInstanceState);
     }
+
+    protected void deleteLeagueMembers(final String leagueID) {
+
+
+        leagueMemberDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    LeagueMemberPair pair = snapshot.getValue(LeagueMemberPair.class);
+                    //If the pair being examined is the target
+                    if (pair.getLeagueID().equals(leagueID)) {
+
+                        //Get a reference to the pair, and then delete it.
+                        snapshot.getRef().removeValue(new DatabaseReference.CompletionListener() {
+                            @Override
+                            public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
+                                Toast.makeText(LeagueActivity.this, "Deleted all members!", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+    }
+
 
     @Override
     public void onBackPressed() {
