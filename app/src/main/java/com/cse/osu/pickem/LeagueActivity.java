@@ -50,8 +50,6 @@ public class LeagueActivity extends AppCompatActivity
     private Button createLeagueButton;
     private Button joinLeagueButton;
     private Button leaveLeagueButton;
-    private Button deleteLeagueButton;
-    private Button renameLeagueButton;
     private DatabaseReference leaguesDatabaseReference;
     private DatabaseReference leagueMemberDatabaseReference;
     private FirebaseAuth auth;
@@ -117,63 +115,6 @@ public class LeagueActivity extends AppCompatActivity
         });
     }
 
-    private void handleDeleteLeagueButton() {
-        deleteLeagueButton = findViewById(R.id.buttonDeleteLeague);
-        deleteLeagueButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //Need to access firebase, set up listener
-                leaguesDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-
-                            //Get the current league on firebase we are looking at
-                            League snapshotLeague = snapshot.getValue(League.class);
-                            String leagueID = leagueIDTextField.getText().toString().trim();
-
-                            //If current user owns the league, and the league is the target league,
-                            if (snapshotLeague.getLeagueOwnerUID().equals(auth.getUid()) && snapshotLeague.getLeagueID().equals(leagueID)) {
-
-                                //Delete all of the league member pairs related to the target league
-                                deleteLeagueMembers(snapshotLeague.getLeagueID());
-
-                                //Delete league.
-                                leaguesDatabaseReference.child(leagueID).removeValue(new DatabaseReference.CompletionListener() {
-                                    @Override
-                                    public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
-                                        Toast.makeText(LeagueActivity.this, "Deleted the league!", Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-                            }
-                        }
-
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                    }
-                });
-
-
-            }
-        });
-    }
-
-    private void handleRenameLeagueButton() {
-        renameLeagueButton = findViewById(R.id.buttonRenameLeague);
-        renameLeagueButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String leagueIDText = leagueIDTextField.getText().toString().trim();
-                String leagueNameText = leagueNameTextField.getText().toString().trim();
-
-                renameLeague(leagueIDText, leagueNameText);
-            }
-        });
-    }
-
     private void handleLeaveLeagueButton() {
         leaveLeagueButton = findViewById(R.id.buttonLeaveLeague);
         leaveLeagueButton.setOnClickListener(new View.OnClickListener() {
@@ -227,8 +168,6 @@ public class LeagueActivity extends AppCompatActivity
         leagueNameTextField = findViewById(R.id.league_name_field);
 
         handleCreateLeagueButton();
-        handleDeleteLeagueButton();
-        handleRenameLeagueButton();
         handleJoinLeagueButton();
         handleLeaveLeagueButton();
 
@@ -237,41 +176,12 @@ public class LeagueActivity extends AppCompatActivity
         yourLeaguesTextView.setText("Your UID: " + auth.getUid());
     }
 
-    protected void renameLeague(final String leagueID, final String newName) {
-        leaguesDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    League snapshotLeague = snapshot.getValue(League.class);
-
-                    //If current user owns the league, and the league being examined is the target,
-                    if (snapshotLeague.getLeagueOwnerUID().equals(auth.getUid()) && snapshotLeague.getLeagueID().equals(leagueID)) {
-
-                        //Create a new map to pass into updateChildren()
-                        Map<String, Object> childrenMap = new HashMap<>();
-
-                        //Add the league we want to change as the key, and the new League as the value
-                        childrenMap.put(snapshotLeague.getLeagueID(), new League(newName, snapshotLeague.getLeagueID(), snapshotLeague.getLeagueOwnerUID()));
-
-                        //Now actually update
-                        snapshot.getRef().getParent().updateChildren(childrenMap);
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "LeagueActivity: onCreate() called!");
         setContentView(R.layout.activity_leagues);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         auth = FirebaseAuth.getInstance();
@@ -324,54 +234,21 @@ public class LeagueActivity extends AppCompatActivity
         });
 
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
-
 
         setUp(savedInstanceState);
     }
 
-    protected void deleteLeagueMembers(final String leagueID) {
-
-
-        leagueMemberDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    LeagueMemberPair pair = snapshot.getValue(LeagueMemberPair.class);
-                    //If the pair being examined is the target
-                    if (pair.getLeagueID().equals(leagueID)) {
-
-                        //Get a reference to the pair, and then delete it.
-                        snapshot.getRef().removeValue(new DatabaseReference.CompletionListener() {
-                            @Override
-                            public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
-                                Toast.makeText(LeagueActivity.this, "Deleted all members!", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-
-    }
-
-
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -421,7 +298,7 @@ public class LeagueActivity extends AppCompatActivity
             startActivity(intent);
         }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }

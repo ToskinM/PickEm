@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
@@ -38,7 +39,6 @@ public class LeagueListFragment extends Fragment {
     private DatabaseReference leaguesDatabaseReference;
     private LeagueAdapter mAdapter;
     private FirebaseAuth auth;
-    private TextView leagueRenameTextView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -121,7 +121,63 @@ public class LeagueListFragment extends Fragment {
             }
         });
     }
+    private void deleteLeague(final String leagueID) {
+        //Need to access firebase, set up listener
+        leaguesDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    //Get the current league on firebase we are looking at
+                    League snapshotLeague = snapshot.getValue(League.class);
 
+                    //If current user owns the league, and the league is the target league,
+                    if (snapshotLeague.getLeagueOwnerUID().equals(auth.getUid()) && snapshotLeague.getLeagueID().equals(leagueID)) {
+
+                        //Delete all of the league member pairs related to the target league
+                        deleteLeagueMembers(snapshotLeague.getLeagueID());
+
+                        //Delete league.
+                        leaguesDatabaseReference.child(leagueID).removeValue(new DatabaseReference.CompletionListener() {
+                            @Override
+                            public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
+                                Log.d(TAG, leagueID + " has been deleted.");
+                            }
+                        });
+                    }
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+    protected void deleteLeagueMembers(final String leagueID) {
+        FirebaseDatabase.getInstance().getReference("leagueMembers").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    LeagueMemberPair pair = snapshot.getValue(LeagueMemberPair.class);
+                    //If the pair being examined is the target
+                    if (pair.getLeagueID().equals(leagueID)) {
+
+                        //Get a reference to the pair, and then delete it.
+                        snapshot.getRef().removeValue(new DatabaseReference.CompletionListener() {
+                            @Override
+                            public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
+                                Log.d(TAG, "League members deleted for the League: " + leagueID);
+                            }
+                        });
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
 
     //// A "container" of recyclerView that holds a list item (a league)
     private class LeagueHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
@@ -158,6 +214,9 @@ public class LeagueListFragment extends Fragment {
                                 if (which == 0){
                                     AlertDialog renameDialog = createRenameDialog();
                                     renameDialog.show();
+                                } else if (which == 1){
+                                    AlertDialog deleteDialog = createDeleteConfirmationDialogue();
+                                    deleteDialog.show();
                                 }
                             }
                         });
@@ -167,6 +226,7 @@ public class LeagueListFragment extends Fragment {
                 return null;
             }
         }
+
         private AlertDialog createRenameDialog() {
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             // Get the layout inflater
@@ -199,6 +259,29 @@ public class LeagueListFragment extends Fragment {
                         }
                     });
             return builder.create();
+        }
+
+        private AlertDialog createDeleteConfirmationDialogue() {
+            Context context = getActivity();
+            if (context != null) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setTitle("Are you sure about that?")
+                        .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int id) {
+                                deleteLeague(mLeague.getLeagueID());
+                            }
+                        })
+                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                // Do nothing, cancelling rename
+                            }
+                        });
+                return builder.create();
+            } else {
+                // Make this better
+                return null;
+            }
         }
     }
 

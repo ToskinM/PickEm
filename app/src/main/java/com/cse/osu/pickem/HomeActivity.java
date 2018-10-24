@@ -71,20 +71,20 @@ public class HomeActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         // Create league RecyclerView Fragment
-        FragmentManager fm = getSupportFragmentManager();
-        Fragment fragment = fm.findFragmentById(R.id.fragment_container);
-        if (fragment == null) {
-            fragment = new LeagueListFragment();
-            fm.beginTransaction()
-                    .add(R.id.fragment_container, fragment)
-                    .commit();
-        }
+        //FragmentManager fm = getSupportFragmentManager();
+        //Fragment fragment = fm.findFragmentById(R.id.fragment_container);
+        //if (fragment == null) {
+        //    fragment = new LeagueListFragment();
+        //    fm.beginTransaction()
+        //            .add(R.id.fragment_container, fragment)
+        //            .commit();
+        //}
 
     }
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
