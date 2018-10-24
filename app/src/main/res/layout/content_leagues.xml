@@ -38,6 +38,18 @@ tools:showIn="@layout/app_bar_leagues">
             android:layout_height="wrap_content"
             android:text="Join League" />
 
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/buttonLeaveLeague"
+            android:text="Leave League"/>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/buttonDeleteLeague"
+            android:text="Delete league"/>
+
         <TextView
             android:id="@+id/yourLeaguesTextView"
             android:layout_width="wrap_content"
@@ -47,19 +59,20 @@ tools:showIn="@layout/app_bar_leagues">
             android:text="@string/yourLeagues_activity_leagues"
             android:textSize="14sp" />
 
+        <FrameLayout
+            android:id="@+id/fragment_container"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/linearLayout">
+
+        </FrameLayout>
 
     </LinearLayout>
 
-    <FrameLayout
-        android:id="@+id/fragment_container"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout">
 
-    </FrameLayout>
 
 
 </android.support.constraint.ConstraintLayout>

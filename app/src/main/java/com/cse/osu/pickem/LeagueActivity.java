@@ -2,7 +2,9 @@ package com.cse.osu.pickem;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
@@ -45,6 +47,8 @@ public class LeagueActivity extends AppCompatActivity
     private TextView yourLeaguesTextView;
     private Button createLeagueButton;
     private Button joinLeagueButton;
+    private Button leaveLeagueButton;
+    private Button deleteLeagueButton;
     private DatabaseReference leaguesDatabaseReference;
     private DatabaseReference leagueMemberDatabaseReference;
     private FirebaseAuth auth;
@@ -132,6 +136,84 @@ public class LeagueActivity extends AppCompatActivity
                 if (okToAdd) {
                     leagueMemberDatabaseReference.push().setValue(pairToAdd);
                 }
+            }
+        });
+
+        deleteLeagueButton = findViewById(R.id.buttonDeleteLeague);
+        deleteLeagueButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                leaguesDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+
+                            League snapshotLeague = snapshot.getValue(League.class);
+                            String leagueID = leagueIDTextField.getText().toString().trim();
+
+                            if (snapshotLeague.getLeagueOwnerUID().equals(auth.getUid()) && snapshotLeague.getLeagueID().equals(leagueID)) {
+                                leaguesDatabaseReference.child(leagueID).removeValue(new DatabaseReference.CompletionListener() {
+                                    @Override
+                                    public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
+                                        Toast.makeText(LeagueActivity.this, "Deleted the league!", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                            }
+                        }
+
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+
+
+            }
+        });
+
+        leaveLeagueButton = findViewById(R.id.buttonLeaveLeague);
+        leaveLeagueButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
+
+                leagueMemberDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+
+                            String currentUserID = auth.getUid();
+                            String enteredLeagueID = leagueIDTextField.getText().toString().trim();
+
+                            String snapshotUserID = snapshot.getValue(LeagueMemberPair.class).getUID();
+                            String snapshotLeagueID = snapshot.getValue(LeagueMemberPair.class).getLeagueID();
+
+
+                            LeagueMemberPair currentPair = new LeagueMemberPair(currentUserID, enteredLeagueID);
+                            LeagueMemberPair snapshotPair = new LeagueMemberPair(snapshotUserID, snapshotLeagueID);
+
+
+                            if (snapshotPair.equals(currentPair)) {
+                                snapshot.getRef().removeValue(new DatabaseReference.CompletionListener() {
+                                    @Override
+                                    public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
+                                        Toast.makeText(LeagueActivity.this, "Removed pair!", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
             }
         });
 
