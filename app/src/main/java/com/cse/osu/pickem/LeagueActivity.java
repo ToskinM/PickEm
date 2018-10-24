@@ -51,6 +51,7 @@ public class LeagueActivity extends AppCompatActivity
     private Button joinLeagueButton;
     private Button leaveLeagueButton;
     private Button deleteLeagueButton;
+    private Button renameLeagueButton;
     private DatabaseReference leaguesDatabaseReference;
     private DatabaseReference leagueMemberDatabaseReference;
     private FirebaseAuth auth;
@@ -147,6 +148,14 @@ public class LeagueActivity extends AppCompatActivity
             }
         });
 
+        renameLeagueButton = findViewById(R.id.buttonRenameLeague);
+        renameLeagueButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                renameLeague(leagueIDTextField.getText().toString().trim(), leagueNameTextField.getText().toString().trim());
+            }
+        });
+
         leaveLeagueButton = findViewById(R.id.buttonLeaveLeague);
         leaveLeagueButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -193,7 +202,7 @@ public class LeagueActivity extends AppCompatActivity
         yourLeaguesTextView.setText("Your UID: " + auth.getUid());
     }
 
-    private void renameLeague(final String leagueID, final String newName) {
+    protected void renameLeague(final String leagueID, final String newName) {
         leaguesDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -203,7 +212,7 @@ public class LeagueActivity extends AppCompatActivity
                     if (snapshotLeague.getLeagueOwnerUID().equals(auth.getUid()) && snapshotLeague.getLeagueID().equals(leagueID)) {
                         Map<String, Object> childrenMap = new HashMap<>();
                         childrenMap.put(snapshotLeague.getLeagueID(), new League(newName, snapshotLeague.getLeagueID(), snapshotLeague.getLeagueOwnerUID()));
-                        snapshot.getRef().updateChildren(childrenMap);
+                        snapshot.getRef().getParent().updateChildren(childrenMap);
                     }
                 }
             }

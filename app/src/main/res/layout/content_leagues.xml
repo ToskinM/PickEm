@@ -50,6 +50,12 @@ tools:showIn="@layout/app_bar_leagues">
             android:id="@+id/buttonDeleteLeague"
             android:text="Delete league"/>
 
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/buttonRenameLeague"
+            android:text="Rename league"/>
+
         <TextView
             android:id="@+id/yourLeaguesTextView"
             android:layout_width="wrap_content"
