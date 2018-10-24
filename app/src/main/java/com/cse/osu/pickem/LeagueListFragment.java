@@ -28,7 +28,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class LeagueListFragment extends Fragment {
     public static final String TAG = "LeagueListFragment";
@@ -91,7 +93,37 @@ public class LeagueListFragment extends Fragment {
         mLeagueRecyclerView.setAdapter(mAdapter);
     }
 
+    protected void renameLeague(final String leagueID, final String newName) {
+        leaguesDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    League snapshotLeague = snapshot.getValue(League.class);
 
+                    //If current user owns the league, and the league being examined is the target,
+                    if (snapshotLeague.getLeagueOwnerUID().equals(auth.getUid()) && snapshotLeague.getLeagueID().equals(leagueID)) {
+
+                        //Create a new map to pass into updateChildren()
+                        Map<String, Object> childrenMap = new HashMap<>();
+
+                        //Add the league we want to change as the key, and the new League as the value
+                        childrenMap.put(snapshotLeague.getLeagueID(), new League(newName, snapshotLeague.getLeagueID(), snapshotLeague.getLeagueOwnerUID()));
+
+                        //Now actually update
+                        snapshot.getRef().getParent().updateChildren(childrenMap);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+
+    //// A "container" of recyclerView that holds a list item (a league)
     private class LeagueHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         private TextView mLeagueNameTextView;
         private League mLeague;
@@ -99,7 +131,7 @@ public class LeagueListFragment extends Fragment {
         public LeagueHolder(LayoutInflater inflater, ViewGroup parent) {
             super(inflater.inflate(R.layout.list_item_league, parent, false));
             itemView.setOnClickListener(this);
-            mLeagueNameTextView = (TextView) itemView.findViewById(R.id.league_name);
+            mLeagueNameTextView = itemView.findViewById(R.id.league_name);
 
         }
         public void bind(League league) {
@@ -111,25 +143,31 @@ public class LeagueListFragment extends Fragment {
             Toast.makeText(getActivity(),
                     "Owned by: " + mLeague.getLeagueOwnerUID(), Toast.LENGTH_SHORT)
                     .show();
-            AlertDialog leagueActionsDialog = createLeagueActionsDialog(mLeague);
+            AlertDialog leagueActionsDialog = createLeagueActionsDialog();
             leagueActionsDialog.show();
         }
 
-        private AlertDialog createLeagueActionsDialog(final League league) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            String[] items = {"Rename", "Delete", "Cancel"};
-            builder.setTitle(league.getLeagueName())
-                    .setItems(items, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            if (which == 0){
-                                AlertDialog renameDialog = createRenameDialog(league);
-                                renameDialog.show();
+        private AlertDialog createLeagueActionsDialog() {
+            Context context = getActivity();
+            if (context != null) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                String[] items = {"Rename", "Delete", "Cancel"};
+                builder.setTitle(mLeague.getLeagueName())
+                        .setItems(items, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                if (which == 0){
+                                    AlertDialog renameDialog = createRenameDialog();
+                                    renameDialog.show();
+                                }
                             }
-                        }
-                    });
-            return builder.create();
+                        });
+                return builder.create();
+            } else {
+                // Make this better
+                return null;
+            }
         }
-        private AlertDialog createRenameDialog(League league) {
+        private AlertDialog createRenameDialog() {
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             // Get the layout inflater
             LayoutInflater inflater = getActivity().getLayoutInflater();
@@ -141,22 +179,30 @@ public class LeagueListFragment extends Fragment {
                         @Override
                         public void onClick(DialogInterface dialog, int id) {
                             Dialog d = (Dialog) dialog;
+
+                            // Get new name for league
                             EditText newNameEditText = d.findViewById(R.id.league_rename);
                             String newName = newNameEditText.getText().toString().trim();
+
+                            // Rename the league
+                            renameLeague(mLeague.getLeagueID(), newName);
+
+                            // Tell user league was renamed successfully
                             Toast.makeText(getActivity(),
-                                    newName, Toast.LENGTH_SHORT)
+                                    "League successfully renamed to: " + newName, Toast.LENGTH_SHORT)
                                     .show();
                         }
                     })
                     .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
-                            //LoginDialogFragment.this.getDialog().cancel();
+                            // Do nothing, cancelling rename
                         }
                     });
             return builder.create();
         }
     }
 
+    //// Links leagues to holders in the recyclerView
     private class LeagueAdapter extends RecyclerView.Adapter<LeagueHolder> {
         private List<League> mLeagues;
 
@@ -165,14 +211,14 @@ public class LeagueListFragment extends Fragment {
         }
 
         @Override
-        public LeagueHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        public LeagueHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
 
             return new LeagueHolder(layoutInflater, parent);
         }
 
         @Override
-        public void onBindViewHolder(LeagueHolder holder, int position) {
+        public void onBindViewHolder(@NonNull LeagueHolder holder, int position) {
             League league = mLeagues.get(position);
             holder.bind(league);
         }
