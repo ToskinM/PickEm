@@ -31,8 +31,10 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class LeagueActivity extends AppCompatActivity
@@ -57,35 +59,6 @@ public class LeagueActivity extends AppCompatActivity
     private Set<LeagueMemberPair> loadedLeagueMemberPairs = new HashSet<LeagueMemberPair>();
 
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        Log.d(TAG, "LeagueActivity: onDestroy() called!");
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Log.d(TAG, "LeagueActivity: onResume() called!");
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        Log.d(TAG, "LeagueActivity: onStart() called!");
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        Log.d(TAG, "LeagueActivity: onStop() called!");
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        Log.d(TAG, "LeagueActivity: onPause() called!");
-    }
 
     private void setUp(Bundle savedInstanceState) {
         leagueIDTextField = findViewById(R.id.league_id_field);
@@ -179,8 +152,6 @@ public class LeagueActivity extends AppCompatActivity
             @Override
             public void onClick(View v) {
 
-
-
                 leagueMemberDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -220,6 +191,28 @@ public class LeagueActivity extends AppCompatActivity
         // Have yourLeaguesTextView display user's id
         yourLeaguesTextView = findViewById(R.id.yourLeaguesTextView);
         yourLeaguesTextView.setText("Your UID: " + auth.getUid());
+    }
+
+    private void renameLeague(final String leagueID, final String newName) {
+        leaguesDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    League snapshotLeague = snapshot.getValue(League.class);
+
+                    if (snapshotLeague.getLeagueOwnerUID().equals(auth.getUid()) && snapshotLeague.getLeagueID().equals(leagueID)) {
+                        Map<String, Object> childrenMap = new HashMap<>();
+                        childrenMap.put(snapshotLeague.getLeagueID(), new League(newName, snapshotLeague.getLeagueID(), snapshotLeague.getLeagueOwnerUID()));
+                        snapshot.getRef().updateChildren(childrenMap);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 
     @Override
