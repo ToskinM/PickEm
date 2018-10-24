@@ -1,5 +1,6 @@
 package com.cse.osu.pickem;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -15,6 +16,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -34,6 +36,7 @@ public class LeagueListFragment extends Fragment {
     private DatabaseReference leaguesDatabaseReference;
     private LeagueAdapter mAdapter;
     private FirebaseAuth auth;
+    private TextView leagueRenameTextView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -48,7 +51,7 @@ public class LeagueListFragment extends Fragment {
         auth = FirebaseAuth.getInstance();
 
         // Setup recycler view
-        mLeagueRecyclerView = (RecyclerView) view.findViewById(R.id.crime_recycler_view);
+        mLeagueRecyclerView = view.findViewById(R.id.crime_recycler_view);
         mLeagueRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         // Update the list
@@ -130,7 +133,6 @@ public class LeagueListFragment extends Fragment {
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             // Get the layout inflater
             LayoutInflater inflater = getActivity().getLayoutInflater();
-
             // Inflate and set the layout for the dialog
             // Pass null as the parent view because its going in the dialog layout
             builder.setView(inflater.inflate(R.layout.dialog_league_rename, null))
@@ -138,7 +140,12 @@ public class LeagueListFragment extends Fragment {
                     .setPositiveButton("Rename", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int id) {
-                            // sign in the user ...
+                            Dialog d = (Dialog) dialog;
+                            EditText newNameEditText = d.findViewById(R.id.league_rename);
+                            String newName = newNameEditText.getText().toString().trim();
+                            Toast.makeText(getActivity(),
+                                    newName, Toast.LENGTH_SHORT)
+                                    .show();
                         }
                     })
                     .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
