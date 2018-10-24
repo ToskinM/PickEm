@@ -21,12 +21,12 @@ public class UserLeagueFetcher {
     private static UserLeagueFetcher sUserLeagueFetcher;
     private DatabaseReference leaguesDatabaseReference;
     private DatabaseReference leagueMemberDatabaseReference;
+    private List<League> loadedLeagues = new ArrayList<>();
     private Set<LeagueMemberPair> loadedLeagueMemberPairs;
     private FirebaseAuth auth;
 
     // List of leagues to be sent to recycler view
     private List<League> mLeagues;
-
 
     public static UserLeagueFetcher get(Context context, FirebaseAuth auth) {
         if (sUserLeagueFetcher == null) {
@@ -57,17 +57,45 @@ public class UserLeagueFetcher {
     public void updateLeagues(){
         mLeagues = new ArrayList<>();
         loadedLeagueMemberPairs = new HashSet<LeagueMemberPair>();
+        loadedLeagues = new ArrayList<>();
+
+        // Get all members of leagues
+        leagueMemberDatabaseReference = FirebaseDatabase.getInstance().getReference("leagueMembers");
+        leagueMemberDatabaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Log.d(TAG, dataSnapshot.getChildrenCount() + "");
+                for(DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    LeagueMemberPair tempPair = snapshot.getValue(LeagueMemberPair.class);
+                    if (!loadedLeagueMemberPairs.contains(tempPair)) {
+                        loadedLeagueMemberPairs.add(tempPair);
+                    }
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+            }
+        });
+        // Get all leagues
         leaguesDatabaseReference = FirebaseDatabase.getInstance().getReference("leagues");
         leaguesDatabaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                Log.d(TAG, "Database Snapshot Taken, " + dataSnapshot.getChildrenCount() + " leagues found.\n");
+                Log.d(TAG, dataSnapshot.getChildrenCount() + "");
                 for(DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     League tempLeague = snapshot.getValue(League.class);
-                    Log.d(TAG, "\tLeagueID: " + tempLeague.getLeagueID() + "\tLeagueName: " + tempLeague.getLeagueName() + "\tLeagueOwner: " + tempLeague.getLeagueOwnerUID() + "\n");
-                    if (tempLeague.getLeagueOwnerUID().equals(auth.getUid())){
-                        mLeagues.add(snapshot.getValue(League.class));
-                        Log.d(TAG, "\t\tCurrent User owns this league; added to list.\n");
+                    if (!loadedLeagues.contains(tempLeague)) {
+                        loadedLeagues.add(tempLeague);
+                    }
+                }
+                // Get leagues user is a member of
+                for(LeagueMemberPair pair : loadedLeagueMemberPairs) {
+                    if (pair.getUID().equals(auth.getUid())){
+                        for(League league : loadedLeagues) {
+                            if (league.getLeagueID().equals(pair.getLeagueID())){
+                                mLeagues.add(league);
+                            }
+                        }
                     }
                 }
             }

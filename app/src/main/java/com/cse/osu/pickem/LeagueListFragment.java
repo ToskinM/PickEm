@@ -1,10 +1,12 @@
 package com.cse.osu.pickem;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -85,22 +87,40 @@ public class LeagueListFragment extends Fragment {
         mAdapter.notifyDataSetChanged();
         mLeagueRecyclerView.setAdapter(mAdapter);
     }
-    private void showPopup() {
-        PopupMenu popupMenu = new PopupMenu(getActivity(), getView());
-        popupMenu.getMenuInflater().inflate(R.menu.popup_menu_leagues, popupMenu.getMenu());
-        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                int id = item.getItemId();
-                if (id == R.id.action_delete_league) {
-                    Toast.makeText(getActivity(),
-                            "Not yet Implemented", Toast.LENGTH_SHORT)
-                            .show();
-                } else if (id == R.id.action_delete_league) {
-                }
-                return true;
-            }
-        });
+    private AlertDialog createLeaguePopupList(final League league) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        String[] items = {"Rename", "Delete", "Cancel"};
+        builder.setTitle(league.getLeagueName())
+                .setItems(items, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (which == 0){
+                            showRenameDialog(league);
+                        }
+                    }
+                });
+        return builder.create();
+    }
+    private void showRenameDialog(League league) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        // Get the layout inflater
+        LayoutInflater inflater = getActivity().getLayoutInflater();
+
+        // Inflate and set the layout for the dialog
+        // Pass null as the parent view because its going in the dialog layout
+        builder.setView(inflater.inflate(R.layout.dialog_league_rename, null))
+                // Add action buttons
+                .setPositiveButton("Rename", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        // sign in the user ...
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        //LoginDialogFragment.this.getDialog().cancel();
+                    }
+                });
+        AlertDialog dialog = builder.create();
     }
 
     private class LeagueHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
@@ -122,7 +142,8 @@ public class LeagueListFragment extends Fragment {
             Toast.makeText(getActivity(),
                     "Owned by: " + mLeague.getLeagueOwnerUID(), Toast.LENGTH_SHORT)
                     .show();
-            showPopup();
+            //AlertDialog alert = createLeaguePopupList(mLeague);
+            //alert.show();
         }
     }
 
