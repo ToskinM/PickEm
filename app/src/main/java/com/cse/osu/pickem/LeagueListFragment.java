@@ -87,41 +87,7 @@ public class LeagueListFragment extends Fragment {
         mAdapter.notifyDataSetChanged();
         mLeagueRecyclerView.setAdapter(mAdapter);
     }
-    private AlertDialog createLeaguePopupList(final League league) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        String[] items = {"Rename", "Delete", "Cancel"};
-        builder.setTitle(league.getLeagueName())
-                .setItems(items, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        if (which == 0){
-                            showRenameDialog(league);
-                        }
-                    }
-                });
-        return builder.create();
-    }
-    private void showRenameDialog(League league) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        // Get the layout inflater
-        LayoutInflater inflater = getActivity().getLayoutInflater();
 
-        // Inflate and set the layout for the dialog
-        // Pass null as the parent view because its going in the dialog layout
-        builder.setView(inflater.inflate(R.layout.dialog_league_rename, null))
-                // Add action buttons
-                .setPositiveButton("Rename", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-                        // sign in the user ...
-                    }
-                })
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        //LoginDialogFragment.this.getDialog().cancel();
-                    }
-                });
-        AlertDialog dialog = builder.create();
-    }
 
     private class LeagueHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         private TextView mLeagueNameTextView;
@@ -142,8 +108,45 @@ public class LeagueListFragment extends Fragment {
             Toast.makeText(getActivity(),
                     "Owned by: " + mLeague.getLeagueOwnerUID(), Toast.LENGTH_SHORT)
                     .show();
-            //AlertDialog alert = createLeaguePopupList(mLeague);
-            //alert.show();
+            AlertDialog leagueActionsDialog = createLeagueActionsDialog(mLeague);
+            leagueActionsDialog.show();
+        }
+
+        private AlertDialog createLeagueActionsDialog(final League league) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            String[] items = {"Rename", "Delete", "Cancel"};
+            builder.setTitle(league.getLeagueName())
+                    .setItems(items, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            if (which == 0){
+                                AlertDialog renameDialog = createRenameDialog(league);
+                                renameDialog.show();
+                            }
+                        }
+                    });
+            return builder.create();
+        }
+        private AlertDialog createRenameDialog(League league) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            // Get the layout inflater
+            LayoutInflater inflater = getActivity().getLayoutInflater();
+
+            // Inflate and set the layout for the dialog
+            // Pass null as the parent view because its going in the dialog layout
+            builder.setView(inflater.inflate(R.layout.dialog_league_rename, null))
+                    // Add action buttons
+                    .setPositiveButton("Rename", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int id) {
+                            // sign in the user ...
+                        }
+                    })
+                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            //LoginDialogFragment.this.getDialog().cancel();
+                        }
+                    });
+            return builder.create();
         }
     }
 
