@@ -19,10 +19,8 @@ import java.util.Set;
 public class UserLeagueFetcher {
     public static final String TAG = "LeagueFetcher";
     private static UserLeagueFetcher sUserLeagueFetcher;
-    private DatabaseReference leaguesDatabaseReference;
-    private DatabaseReference leagueMemberDatabaseReference;
-    private List<League> loadedLeagues = new ArrayList<>();
-    private Set<LeagueMemberPair> loadedLeagueMemberPairs;
+    private List<League> mFetchedLeagues;
+    private Set<LeagueMemberPair> mFetchedLeagueMembers;
     private FirebaseAuth auth;
 
     // List of leagues to be sent to recycler view
@@ -37,11 +35,15 @@ public class UserLeagueFetcher {
 
     private UserLeagueFetcher(Context context, final FirebaseAuth auth) {
         this.auth = auth;
-        updateLeagues();
+        this.mLeagues = new ArrayList<>();
+        this.mFetchedLeagueMembers = new HashSet<>();
+        this.mFetchedLeagues = new ArrayList<>();
+        setupDatabaseListeners();
+
     }
 
     public List<League> getLeagues() {
-        return mLeagues;
+        return this.mLeagues;
     }
 
     public League getLeague(String leagueID) {
@@ -50,54 +52,59 @@ public class UserLeagueFetcher {
                 return league;
             }
         }
-
         return null;
     }
 
-    public void updateLeagues(){
-        mLeagues = new ArrayList<>();
-        loadedLeagueMemberPairs = new HashSet<LeagueMemberPair>();
-        loadedLeagues = new ArrayList<>();
+    public void updateUsersLeagues(){
+        this.mLeagues.clear();
+        // Get leagues user is a member of
+        for(LeagueMemberPair pair : this.mFetchedLeagueMembers) {
+            if (pair.getUID().equals(auth.getUid())){
+                for(League league : this.mFetchedLeagues) {
+                    if (league.getLeagueID().equals(pair.getLeagueID())){
+                        this.mLeagues.add(league);
+                    }
+                }
+            }
+        }
+    }
 
-        // Get all members of leagues
-        leagueMemberDatabaseReference = FirebaseDatabase.getInstance().getReference("leagueMembers");
+    private void setupDatabaseListeners(){
+        // Get database references
+        DatabaseReference leaguesDatabaseReference = FirebaseDatabase.getInstance().getReference("leagues");
+        DatabaseReference leagueMemberDatabaseReference = FirebaseDatabase.getInstance().getReference("leagueMembers");
+
+        // League Members listener
         leagueMemberDatabaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                mFetchedLeagueMembers.clear();
                 Log.d(TAG, dataSnapshot.getChildrenCount() + "");
                 for(DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     LeagueMemberPair tempPair = snapshot.getValue(LeagueMemberPair.class);
-                    if (!loadedLeagueMemberPairs.contains(tempPair)) {
-                        loadedLeagueMemberPairs.add(tempPair);
+                    if (!mFetchedLeagueMembers.contains(tempPair)) {
+                        mFetchedLeagueMembers.add(tempPair);
                     }
                 }
+                updateUsersLeagues();
             }
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
             }
         });
-        // Get all leagues
-        leaguesDatabaseReference = FirebaseDatabase.getInstance().getReference("leagues");
+        // Leagues listener
         leaguesDatabaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                mFetchedLeagues.clear();
                 Log.d(TAG, dataSnapshot.getChildrenCount() + "");
                 for(DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     League tempLeague = snapshot.getValue(League.class);
-                    if (!loadedLeagues.contains(tempLeague)) {
-                        loadedLeagues.add(tempLeague);
+                    if (!mFetchedLeagues.contains(tempLeague)) {
+                        mFetchedLeagues.add(tempLeague);
                     }
                 }
-                // Get leagues user is a member of
-                for(LeagueMemberPair pair : loadedLeagueMemberPairs) {
-                    if (pair.getUID().equals(auth.getUid())){
-                        for(League league : loadedLeagues) {
-                            if (league.getLeagueID().equals(pair.getLeagueID())){
-                                mLeagues.add(league);
-                            }
-                        }
-                    }
-                }
+                updateUsersLeagues();
             }
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {

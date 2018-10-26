@@ -13,12 +13,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -86,16 +83,10 @@ public class LeagueListFragment extends Fragment {
         mLeagueRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         // Update the list
-        leaguesDatabaseReference = FirebaseDatabase.getInstance().getReference("leagues");
-        leaguesDatabaseReference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                updateUI();
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-            }
-        });
+        //updateUI();
+
+        // Setup Listeners
+        setupDatabaseListeners();
 
         return view;
     }
@@ -113,7 +104,7 @@ public class LeagueListFragment extends Fragment {
     private void updateUI() {
         // Get user's owned leagues
         UserLeagueFetcher userLeagueFetcher = UserLeagueFetcher.get(getActivity(), auth);
-        userLeagueFetcher.updateLeagues();
+        userLeagueFetcher.updateUsersLeagues();
         List<League> leagues = userLeagueFetcher.getLeagues();
 
         mAdapter = new LeagueAdapter(leagues);
@@ -177,6 +168,33 @@ public class LeagueListFragment extends Fragment {
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
+            }
+        });
+    }
+
+    private void setupDatabaseListeners(){
+        // Get database references
+        DatabaseReference leaguesDatabaseReference = FirebaseDatabase.getInstance().getReference("leagues");
+        DatabaseReference leagueMemberDatabaseReference = FirebaseDatabase.getInstance().getReference("leagueMembers");
+
+        // League Members listener
+        leagueMemberDatabaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                updateUI();
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+            }
+        });
+        // Leagues listener
+        leaguesDatabaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                updateUI();
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
             }
         });
     }

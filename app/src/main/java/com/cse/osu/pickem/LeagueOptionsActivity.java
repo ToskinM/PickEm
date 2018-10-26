@@ -1,15 +1,18 @@
 package com.cse.osu.pickem;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -29,12 +32,15 @@ import java.util.Map;
 
 public class LeagueOptionsActivity extends AppCompatActivity {
 
+    public static final String TAG = "LeagueOptionsActivity";
+
     private Button addGameButton;
     private Button manageGamesButton;
     private Button renameLeagueButton;
     private Button deleteLeagueButton;
 
-    private DatabaseReference leagueReference;
+    private DatabaseReference leagueDatabaseReference;
+    private DatabaseReference leagueMembersDatabaseReference;
     private FirebaseAuth auth;
     private League mLeague;
 
@@ -48,13 +54,42 @@ public class LeagueOptionsActivity extends AppCompatActivity {
         });
     }
 
+    protected void setupDeleteLeagueButton() {
+        // Build the confirmation dialog once, ahead of time
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Are you sure about that?")
+                .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        deleteLeague();
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        // Do nothing, cancelling delete
+                    }
+                });
+        final AlertDialog deleteConfirmationDialog = builder.create();
+
+        // Wire button to show confirmation
+        deleteLeagueButton = findViewById(R.id.buttonDeleteLeague);
+        deleteLeagueButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                deleteConfirmationDialog.show();
+            }
+        });
+    }
+
     protected void setupRenameLeagueButton() {
+        // Build the confirmation dialog once, ahead of time
+        final AlertDialog renameDialog = createRenameDialog();
+
+        // Wire button to show dialog
         renameLeagueButton = findViewById(R.id.buttonRenameLeague);
         renameLeagueButton.setOnClickListener(new View.OnClickListener() {
            @Override
            public void onClick(View v) {
-               // Show rename dialog
-               AlertDialog renameDialog = createRenameDialog();
                renameDialog.show();
            }
         });
@@ -81,7 +116,7 @@ public class LeagueOptionsActivity extends AppCompatActivity {
                         renameLeague(mLeague.getLeagueID(), newName);
 
                         // Tell user league was renamed successfully
-                        Snackbar.make(d.findViewById(android.R.id.content), "Rename Successful", Snackbar.LENGTH_LONG)
+                        Snackbar.make(LeagueOptionsActivity.this.findViewById(android.R.id.content), "Rename Successful", Snackbar.LENGTH_LONG)
                                 .setAction("Action", null).show();
                     }
                 })
@@ -94,7 +129,7 @@ public class LeagueOptionsActivity extends AppCompatActivity {
     }
 
     protected void renameLeague(final String leagueID, final String newName) {
-        leagueReference.addListenerForSingleValueEvent(new ValueEventListener() {
+        leagueDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
@@ -122,6 +157,65 @@ public class LeagueOptionsActivity extends AppCompatActivity {
         });
     }
 
+    private void deleteLeague() {
+        //Need to access firebase, set up listener
+        leagueDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    //Get the current league on Firebase we are looking at
+                    League snapshotLeague = snapshot.getValue(League.class);
+
+                    //If current user owns the league, and the league is the target league,
+                    if (snapshotLeague.getLeagueOwnerUID().equals(auth.getUid()) && snapshotLeague.getLeagueID().equals(mLeague.getLeagueID())) {
+
+                        //Delete all of the league member pairs related to the target league
+                        deleteLeagueMembers();
+
+                        //Delete league.
+                        leagueDatabaseReference.child(mLeague.getLeagueID()).removeValue(new DatabaseReference.CompletionListener() {
+                            @Override
+                            public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
+                                Log.d(TAG, mLeague.getLeagueID() + " has been deleted.");
+                            }
+                        });
+                    }
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+        finish();
+    }
+    protected void deleteLeagueMembers() {
+        leagueMembersDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    LeagueMemberPair pair = snapshot.getValue(LeagueMemberPair.class);
+                    //If the pair being examined is the target
+                    if (pair.getLeagueID().equals(mLeague.getLeagueID())) {
+
+                        //Get a reference to the pair, and then delete it.
+                        snapshot.getRef().removeValue(new DatabaseReference.CompletionListener() {
+                            @Override
+                            public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
+                                Log.d(TAG, "League members deleted for the League: " + mLeague.getLeagueID());
+                            }
+                        });
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -130,7 +224,9 @@ public class LeagueOptionsActivity extends AppCompatActivity {
         Intent creatorIntent = getIntent();
         mLeague = creatorIntent.getParcelableExtra("league");
 
-        leagueReference = FirebaseDatabase.getInstance().getReference("leagues");
+        // Get Firebase Database references
+        leagueDatabaseReference = FirebaseDatabase.getInstance().getReference("leagues");
+        leagueMembersDatabaseReference = FirebaseDatabase.getInstance().getReference("leagueMembers");
         auth = FirebaseAuth.getInstance();
 
         setContentView(R.layout.activity_league_options);
@@ -138,6 +234,7 @@ public class LeagueOptionsActivity extends AppCompatActivity {
         // Wire-up buttons
         setupAddGameButton();
         setupRenameLeagueButton();
+        setupDeleteLeagueButton();
 
         // Display league's name at the top
         TextView leagueNameTextView = findViewById(R.id.textViewLeagueName);
@@ -146,15 +243,6 @@ public class LeagueOptionsActivity extends AppCompatActivity {
         // Setup toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
     }
 
 }
