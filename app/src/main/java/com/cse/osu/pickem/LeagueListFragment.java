@@ -201,6 +201,11 @@ public class LeagueListFragment extends Fragment {
                     .show();
             AlertDialog leagueActionsDialog = createLeagueActionsDialog();
             leagueActionsDialog.show();
+
+            // Launch league options activity, sending the League to manage via the intent
+            Intent intent = new Intent(getActivity(), LeagueOptionsActivity.class);
+            //intent.putExtra("league", mLeague);
+            startActivity(intent);
         }
 
         private AlertDialog createLeagueActionsDialog() {
