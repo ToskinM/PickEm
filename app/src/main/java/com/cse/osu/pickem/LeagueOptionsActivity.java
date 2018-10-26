@@ -1,5 +1,6 @@
 package com.cse.osu.pickem;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -28,6 +29,7 @@ public class LeagueOptionsActivity extends AppCompatActivity {
 
     private DatabaseReference leagueReference;
     private FirebaseAuth auth;
+    private League mLeague;
 
     protected void setupAddGameButton() {
         addGameButton = findViewById(R.id.buttonRenameLeague);
@@ -81,6 +83,10 @@ public class LeagueOptionsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Get the league we're working with from intent
+        Intent creatorIntent = getIntent();
+        League mLeague = (League) creatorIntent.getParcelableExtra("league");
 
         leagueReference = FirebaseDatabase.getInstance().getReference("leagues");
         auth = FirebaseAuth.getInstance();
