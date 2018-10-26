@@ -196,15 +196,16 @@ public class LeagueListFragment extends Fragment {
         }
         @Override
         public void onClick(View view) {
-            Toast.makeText(getActivity(),
-                    "Owned by: " + mLeague.getLeagueOwnerUID(), Toast.LENGTH_SHORT)
-                    .show();
-            AlertDialog leagueActionsDialog = createLeagueActionsDialog();
-            leagueActionsDialog.show();
+            //// Show league options popup dialog
+            //Toast.makeText(getActivity(),
+            //        "Owned by: " + mLeague.getLeagueOwnerUID(), Toast.LENGTH_SHORT)
+            //        .show();
+            //AlertDialog leagueActionsDialog = createLeagueActionsDialog();
+            //leagueActionsDialog.show();
 
             // Launch league options activity, sending the League to manage via the intent
             Intent intent = new Intent(getActivity(), LeagueOptionsActivity.class);
-            //intent.putExtra("league", mLeague);
+            intent.putExtra("league", mLeague);
             startActivity(intent);
         }
 
