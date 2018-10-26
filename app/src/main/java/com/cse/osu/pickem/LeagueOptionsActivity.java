@@ -1,14 +1,21 @@
 package com.cse.osu.pickem;
 
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -32,7 +39,7 @@ public class LeagueOptionsActivity extends AppCompatActivity {
     private League mLeague;
 
     protected void setupAddGameButton() {
-        addGameButton = findViewById(R.id.buttonRenameLeague);
+        addGameButton = findViewById(R.id.buttonAddGame);
         addGameButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -46,9 +53,44 @@ public class LeagueOptionsActivity extends AppCompatActivity {
         renameLeagueButton.setOnClickListener(new View.OnClickListener() {
            @Override
            public void onClick(View v) {
-               //On click, open thing and do stuff
+               // Show rename dialog
+               AlertDialog renameDialog = createRenameDialog();
+               renameDialog.show();
            }
         });
+    }
+
+    private AlertDialog createRenameDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(LeagueOptionsActivity.this);
+        // Get the layout inflater
+        LayoutInflater inflater = LeagueOptionsActivity.this.getLayoutInflater();
+        // Inflate and set the layout for the dialog
+        // Pass null as the parent view because its going in the dialog layout
+        builder.setView(inflater.inflate(R.layout.dialog_league_rename, null))
+                // Add action buttons
+                .setPositiveButton("Rename", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        Dialog d = (Dialog) dialog;
+
+                        // Get new name for league
+                        EditText newNameEditText = d.findViewById(R.id.league_rename);
+                        String newName = newNameEditText.getText().toString().trim();
+
+                        // Rename the league
+                        renameLeague(mLeague.getLeagueID(), newName);
+
+                        // Tell user league was renamed successfully
+                        Snackbar.make(d.findViewById(android.R.id.content), "Rename Successful", Snackbar.LENGTH_LONG)
+                                .setAction("Action", null).show();
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        // Do nothing, cancelling rename
+                    }
+                });
+        return builder.create();
     }
 
     protected void renameLeague(final String leagueID, final String newName) {
@@ -86,17 +128,26 @@ public class LeagueOptionsActivity extends AppCompatActivity {
 
         // Get the league we're working with from intent
         Intent creatorIntent = getIntent();
-        League mLeague = (League) creatorIntent.getParcelableExtra("league");
+        mLeague = creatorIntent.getParcelableExtra("league");
 
         leagueReference = FirebaseDatabase.getInstance().getReference("leagues");
         auth = FirebaseAuth.getInstance();
-        setupAddGameButton();
 
         setContentView(R.layout.activity_league_options);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+
+        // Wire-up buttons
+        setupAddGameButton();
+        setupRenameLeagueButton();
+
+        // Display league's name at the top
+        TextView leagueNameTextView = findViewById(R.id.textViewLeagueName);
+        leagueNameTextView.setText(mLeague.getLeagueName());
+
+        // Setup toolbar
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
