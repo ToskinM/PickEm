@@ -33,7 +33,7 @@ public class UserGameFetcher {
 
     private UserGameFetcher(Context context, final String leagueID) {
         this.mLeagueID = leagueID;
-        this.mFetchedGames = new ArrayList<>();
+        this.mLeagueGames = new ArrayList<>();
         setupDatabaseListeners();
 
     }
@@ -51,7 +51,7 @@ public class UserGameFetcher {
         gamesDatabaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                mFetchedGames.clear();
+                mLeagueGames.clear();
                 Log.d(TAG, dataSnapshot.getChildrenCount() + "");
                 for(DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Game tempGame = snapshot.getValue(Game.class);
