@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,6 +41,7 @@ public class GameListFragment extends Fragment {
         if (getArguments() != null){
             mLeagueID = getArguments().getString("leagueID");
         }
+        Log.d(TAG, mLeagueID);
 
         // Setup recycler view
         mGameRecyclerView = view.findViewById(R.id.game_recycler_view);
@@ -63,8 +65,9 @@ public class GameListFragment extends Fragment {
 
     private void updateUI() {
         // Get user's owned leagues
-        UserGameFetcher userGameFetcherFetcher = UserGameFetcher.get(getActivity(), mLeagueID);
-        List<Game> games = userGameFetcherFetcher.getGames();
+        UserGameFetcher userGameFetcher = UserGameFetcher.get(getActivity(), mLeagueID);
+        userGameFetcher.setLeague(mLeagueID);
+        List<Game> games = userGameFetcher.getGames();
 
         mAdapter = new GameAdapter(games);
         mGameRecyclerView.removeAllViews();

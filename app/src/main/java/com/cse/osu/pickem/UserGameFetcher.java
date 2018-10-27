@@ -35,7 +35,10 @@ public class UserGameFetcher {
         this.mLeagueID = leagueID;
         this.mLeagueGames = new ArrayList<>();
         setupDatabaseListeners();
+    }
 
+    public void setLeague(String leagueID){
+        this.mLeagueID = leagueID;
     }
 
     public List<Game> getGames() {
