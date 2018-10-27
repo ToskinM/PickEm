@@ -5,13 +5,13 @@
     android:layout_height="wrap_content">
 
     <EditText
-        android:id="@+id/league_rename"
+        android:id="@+id/league_id"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="4dp"
         android:layout_marginTop="4dp"
         android:layout_marginRight="4dp"
         android:layout_marginBottom="4dp"
-        android:hint="new league name"
-        android:inputType="textCapWords|textAutoCorrect|textAutoComplete" />
+        android:hint="Enter League ID"
+        android:inputType="text" />
 </LinearLayout>

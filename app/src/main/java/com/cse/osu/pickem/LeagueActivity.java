@@ -1,14 +1,18 @@
 package com.cse.osu.pickem;
 
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -80,6 +84,44 @@ public class LeagueActivity extends AppCompatActivity
             }
         });
     }
+    private AlertDialog createCreateLeagueDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(LeagueActivity.this);
+        // Get the layout inflater
+        LayoutInflater inflater = LeagueActivity.this.getLayoutInflater();
+        // Inflate and set the layout for the dialog
+        // Pass null as the parent view because its going in the dialog layout
+        builder.setView(inflater.inflate(R.layout.dialog_create_league, null))
+                // Add action buttons
+                .setPositiveButton("Create", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        Dialog d = (Dialog) dialog;
+
+                        // Get league ID/Name of league to create
+                        EditText leagueIDEditText = d.findViewById(R.id.league_id);
+                        String leagueID = leagueIDEditText.getText().toString().trim();
+                        EditText leagueNameEditText = d.findViewById(R.id.league_name);
+                        String leagueName = leagueNameEditText.getText().toString().trim();
+
+                        if (!leagueID.equals("")) {
+                            //Set up new league, and add it to firebase
+                            League newLeague = new League(leagueName, leagueID, auth.getCurrentUser().getUid());
+                            leaguesDatabaseReference.child(leagueID).setValue(newLeague);
+                        } else {
+                            //Error handling
+                            AlertDialog alertDialog = new AlertDialog.Builder(LeagueActivity.this).create();
+                            alertDialog.setMessage("LeagueID cannot be empty.");
+                            alertDialog.show();
+                        }
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        // Do nothing, cancelling rename
+                    }
+                });
+        return builder.create();
+    }
 
     private void handleJoinLeagueButton() {
         // League Join
@@ -98,7 +140,6 @@ public class LeagueActivity extends AppCompatActivity
                         okToAdd = true;
                     }
                 }
-
                 //Ensure user isn't already a member of the league
                 for (LeagueMemberPair testPair : loadedLeagueMemberPairs) {
                     if (testPair.equals(pairToAdd)) {
@@ -106,13 +147,60 @@ public class LeagueActivity extends AppCompatActivity
                         okToAdd = false;
                     }
                 }
-
                 //Passes all tests, add new league pair
                 if (okToAdd) {
                     leagueMemberDatabaseReference.push().setValue(pairToAdd);
                 }
             }
         });
+    }
+    private AlertDialog createJoinLeagueDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(LeagueActivity.this);
+        // Get the layout inflater
+        LayoutInflater inflater = LeagueActivity.this.getLayoutInflater();
+        // Inflate and set the layout for the dialog
+        // Pass null as the parent view because its going in the dialog layout
+        builder.setView(inflater.inflate(R.layout.dialog_join_league, null))
+                // Add action buttons
+                .setPositiveButton("Join", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        Dialog d = (Dialog) dialog;
+
+                        // Get league ID of league to join
+                        EditText leagueIDEditText = d.findViewById(R.id.league_id);
+                        String leagueID = leagueIDEditText.getText().toString().trim();
+
+                        LeagueMemberPair pairToAdd = new LeagueMemberPair(auth.getUid(), leagueID);
+                        boolean okToAdd = false;
+
+                        //Ensure league exists
+                        for (League league : loadedLeagues) {
+                            if (league.getLeagueID().equals(leagueID)) {
+                                okToAdd = true;
+                            }
+                        }
+
+                        //Ensure user isn't already a member of the league
+                        for (LeagueMemberPair testPair : loadedLeagueMemberPairs) {
+                            if (testPair.equals(pairToAdd)) {
+                                Log.d("PickEm", "Already exists in thing");
+                                okToAdd = false;
+                            }
+                        }
+
+                        //Passes all tests, add new league pair
+                        if (okToAdd) {
+                            leagueMemberDatabaseReference.push().setValue(pairToAdd);
+                        }
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        // Do nothing, cancelling rename
+                    }
+                });
+        return builder.create();
     }
 
     private void handleLeaveLeagueButton() {
@@ -260,21 +348,21 @@ public class LeagueActivity extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.leagues, menu);
+
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the HomeActivity/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        switch (id){
+            case R.id.action_create:
+                AlertDialog createDialog = createCreateLeagueDialog();
+                createDialog.show();
+            case R.id.action_join:
+                AlertDialog joinDialog = createJoinLeagueDialog();
+                joinDialog.show();
         }
-
         return super.onOptionsItemSelected(item);
     }
 

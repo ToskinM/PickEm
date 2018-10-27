@@ -31,6 +31,9 @@
     <string name="title_activity_league_options">Manage League</string>
     <string name="button_cancel">Cancel</string>
     <string name="add_game">Add Game</string>
-    <string name="rename">Rename League</string>
-    <string name="delete">Delete League</string>
+    <string name="rename_league">Rename League</string>
+    <string name="delete_league">Delete League</string>
+    <string name="delete">Delete</string>
+    <string name="create_league">Create League</string>
+    <string name="join_league">Join League</string>
 </resources>

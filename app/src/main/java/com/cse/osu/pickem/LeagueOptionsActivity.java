@@ -263,15 +263,11 @@ public class LeagueOptionsActivity extends AppCompatActivity {
         switch (id){
             case R.id.action_addGame:
                 // Add Game here
-                return true;
             case R.id.action_rename:
                 renameDialog.show();
-                return true;
             case R.id.action_delete:
                 deleteDialog.show();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
         }
+        return super.onOptionsItemSelected(item);
     }
 }

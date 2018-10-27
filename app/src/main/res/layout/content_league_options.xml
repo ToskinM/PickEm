@@ -37,13 +37,13 @@
             android:id="@+id/buttonRenameLeague"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/rename" />
+            android:text="@string/rename_league" />
 
         <Button
             android:id="@+id/buttonDeleteLeague"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/delete"
+            android:text="@string/delete_league"
             android:textColor="@android:color/holo_red_dark" />
 
     </LinearLayout>
