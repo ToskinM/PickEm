@@ -20,85 +20,50 @@ public class UserGameFetcher {
     public static final String TAG = "GameFetcher";
     private static UserGameFetcher sUserGameFetcher;
     private List<Game> mFetchedGames;
-    private Set<LeagueMemberPair> mFetchedGameMembers;
-    private FirebaseAuth auth;
+    private String mLeagueID;
     // List of leagues to be sent to recycler view
-    private List<Game> mGames;
+    private List<Game> mLeagueGames;
 
-    public static UserGameFetcher get(Context context, FirebaseAuth auth) {
+    public static UserGameFetcher get(Context context, String leagueID) {
         if (sUserGameFetcher == null) {
-            sUserGameFetcher = new UserGameFetcher(context, auth);
+            sUserGameFetcher = new UserGameFetcher(context, leagueID);
         }
         return sUserGameFetcher;
     }
 
-    private UserGameFetcher(Context context, final FirebaseAuth auth) {
-        this.auth = auth;
-        this.mGames = new ArrayList<>();
-        this.mFetchedGameMembers = new HashSet<>();
+    private UserGameFetcher(Context context, final String leagueID) {
+        this.mLeagueID = leagueID;
         this.mFetchedGames = new ArrayList<>();
         setupDatabaseListeners();
 
     }
 
     public List<Game> getGames() {
-        return this.mGames;
+        return this.mLeagueGames;
     }
 
-    public Game getGame(String leagueID) {
-        //for (Game game : mGames) {
-            //if (game.getLeagueID().equals(leagueID)) {
-            //    return game;
-            //}
-        //}
-        return null;
-    }
-
-    public void updateUsersLeagues(){
-        this.mGames.clear();
-        // Get games of the current league
-    }
 
     private void setupDatabaseListeners(){
         // Get database references
-        DatabaseReference leaguesDatabaseReference = FirebaseDatabase.getInstance().getReference("leagues");
-        DatabaseReference leagueMemberDatabaseReference = FirebaseDatabase.getInstance().getReference("leagueMembers");
+        DatabaseReference gamesDatabaseReference = FirebaseDatabase.getInstance().getReference("games");
 
         // League Members listener
-        leagueMemberDatabaseReference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                mFetchedGameMembers.clear();
-                Log.d(TAG, dataSnapshot.getChildrenCount() + "");
-                for(DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    LeagueMemberPair tempPair = snapshot.getValue(LeagueMemberPair.class);
-                    if (!mFetchedGameMembers.contains(tempPair)) {
-                        mFetchedGameMembers.add(tempPair);
-                    }
-                }
-                updateUsersLeagues();
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-            }
-        });
-        // Leagues listener
-        leaguesDatabaseReference.addValueEventListener(new ValueEventListener() {
+        gamesDatabaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 mFetchedGames.clear();
                 Log.d(TAG, dataSnapshot.getChildrenCount() + "");
                 for(DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    League tempLeague = snapshot.getValue(League.class);
-                    if (!mFetchedGames.contains(tempLeague)) {
-                        //mFetchedGames.add(tempLeague);
+                    Game tempGame = snapshot.getValue(Game.class);
+                    if (tempGame.getLeagueID().equals(mLeagueID)) {
+                        mLeagueGames.add(tempGame);
                     }
                 }
-                updateUsersLeagues();
             }
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
             }
         });
+
     }
 }
