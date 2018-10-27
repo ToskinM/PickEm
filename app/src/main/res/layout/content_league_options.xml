@@ -9,6 +9,7 @@
     tools:showIn="@layout/activity_league_options">
 
     <LinearLayout
+        android:id="@+id/linearLayout2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
@@ -22,16 +23,16 @@
             tools:text="League Name" />
 
         <Button
+            android:id="@+id/buttonAddGame"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Add Game"
-            android:id="@+id/buttonAddGame"/>
+            android:text="Add Game" />
 
         <Button
+            android:id="@+id/buttonManageGame"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Manage games"
-            android:id="@+id/buttonManageGame"/>
+            android:text="Manage games" />
 
         <Button
             android:id="@+id/buttonRenameLeague"
@@ -47,13 +48,21 @@
             android:textColor="@android:color/holo_red_dark" />
 
         <Button
+            android:id="@+id/buttonBackToLeagues"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/buttonBackToLeagues"
-            android:text="Back"/>
+            android:text="Back" />
 
     </LinearLayout>
 
+    <FrameLayout
+        android:id="@+id/fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout2">
+
+    </FrameLayout>
 
 
 </android.support.constraint.ConstraintLayout>

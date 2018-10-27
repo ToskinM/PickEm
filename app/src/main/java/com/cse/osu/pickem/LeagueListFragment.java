@@ -79,7 +79,7 @@ public class LeagueListFragment extends Fragment {
         auth = FirebaseAuth.getInstance();
 
         // Setup recycler view
-        mLeagueRecyclerView = view.findViewById(R.id.crime_recycler_view);
+        mLeagueRecyclerView = view.findViewById(R.id.league_recycler_view);
         mLeagueRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         // Update the list
