@@ -3,22 +3,34 @@ package com.cse.osu.pickem;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.Date;
+
 public class Game implements Parcelable {
 
     private String firstTeamName;
     private String secondTeamName;
     private String leagueID;
-
-
-
-
-
-    //private boolean isLocked = false;
+    private boolean isLocked;
+    private Date mLockTime;
 
     public Game(String firstTeamName, String secondTeamName, String leagueID) {
         this.firstTeamName = firstTeamName;
         this.secondTeamName = secondTeamName;
         this.leagueID = leagueID;
+    }
+
+    public void setLockTime(Date lockTime) {
+        mLockTime = lockTime;
+    }
+
+    public boolean isLocked() {
+        return isLocked;
+    }
+
+    public void checkTime() {
+        if (mLockTime.before(new Date())) {
+            isLocked = true;
+        }
     }
 
     public Game() {
@@ -72,7 +84,6 @@ public class Game implements Parcelable {
     }
 
     private Game(Parcel in) {
-        //TODO: Make this less weird? maybe?
         this.firstTeamName = in.readString();
         this.secondTeamName = in.readString();
         this.leagueID = in.readString();
