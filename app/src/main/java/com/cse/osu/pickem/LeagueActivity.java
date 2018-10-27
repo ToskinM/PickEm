@@ -91,6 +91,7 @@ public class LeagueActivity extends AppCompatActivity
         // Inflate and set the layout for the dialog
         // Pass null as the parent view because its going in the dialog layout
         builder.setView(inflater.inflate(R.layout.dialog_create_league, null))
+                .setTitle("Create League")
                 // Add action buttons
                 .setPositiveButton("Create", new DialogInterface.OnClickListener() {
                     @Override
@@ -161,6 +162,7 @@ public class LeagueActivity extends AppCompatActivity
         // Inflate and set the layout for the dialog
         // Pass null as the parent view because its going in the dialog layout
         builder.setView(inflater.inflate(R.layout.dialog_join_league, null))
+                .setTitle("Join League")
                 // Add action buttons
                 .setPositiveButton("Join", new DialogInterface.OnClickListener() {
                     @Override
