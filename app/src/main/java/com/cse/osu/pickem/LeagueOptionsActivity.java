@@ -40,11 +40,13 @@ public class LeagueOptionsActivity extends AppCompatActivity {
     private Button manageGamesButton;
     private Button renameLeagueButton;
     private Button deleteLeagueButton;
+    private Button backButton;
     private AlertDialog renameDialog;
     private AlertDialog deleteDialog;
 
     private DatabaseReference leagueDatabaseReference;
     private DatabaseReference leagueMembersDatabaseReference;
+    private DatabaseReference gameDatabaseReference;
     private FirebaseAuth auth;
     private League mLeague;
 
@@ -53,9 +55,41 @@ public class LeagueOptionsActivity extends AppCompatActivity {
         addGameButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                addGameDialog().show();
             }
         });
+    }
+
+    protected AlertDialog addGameDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Enter game information");
+        LayoutInflater inflater = LeagueOptionsActivity.this.getLayoutInflater();
+        builder.setView(inflater.inflate(R.layout.dialog_league_addgame, null))
+                .setPositiveButton("Create", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Dialog d = (Dialog) dialog;
+                String teamAText = ((EditText)d.findViewById(R.id.teamA_text)).getText().toString().trim();
+                String teamBText = ((EditText)d.findViewById(R.id.teamB_text)).getText().toString().trim();
+                String leagueID = mLeague.getLeagueID();
+                Log.d("PickEm", "YEET:" + leagueID);
+
+                Game newGame = new Game(teamAText, teamBText, leagueID);
+                addGame(newGame);
+            }
+        })
+        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                //Nothing
+            }
+        });
+
+        return builder.create();
+    }
+
+    protected void addGame(Game gameIn) {
+        gameDatabaseReference.push().setValue(gameIn);
     }
 
     protected AlertDialog createDeleteLeagueDialog() {
@@ -153,6 +187,8 @@ public class LeagueOptionsActivity extends AppCompatActivity {
                         snapshot.getRef().getParent().updateChildren(childrenMap);
                     }
                 }
+                TextView leagueNameTextView = findViewById(R.id.textViewLeagueName);
+                leagueNameTextView.setText(newName);
             }
 
             @Override
@@ -232,6 +268,7 @@ public class LeagueOptionsActivity extends AppCompatActivity {
         // Get Firebase Database references
         leagueDatabaseReference = FirebaseDatabase.getInstance().getReference("leagues");
         leagueMembersDatabaseReference = FirebaseDatabase.getInstance().getReference("leagueMembers");
+        gameDatabaseReference = FirebaseDatabase.getInstance().getReference("games");
         auth = FirebaseAuth.getInstance();
 
         setContentView(R.layout.activity_league_options);
@@ -239,6 +276,16 @@ public class LeagueOptionsActivity extends AppCompatActivity {
 
         // Setup Dialogs
         setupAddGameButton();
+        setupRenameLeagueButton();
+        backButton = findViewById(R.id.buttonBackToLeagues);
+        backButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                Intent newIntent = new Intent(LeagueOptionsActivity.this, LeagueActivity.class);
+                startActivity(newIntent);
+            }
+        });
         renameDialog = createRenameDialog();
         deleteDialog = createDeleteLeagueDialog();
 

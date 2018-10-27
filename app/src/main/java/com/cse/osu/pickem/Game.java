@@ -1,15 +1,24 @@
 package com.cse.osu.pickem;
 
-public class Game {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class Game implements Parcelable {
 
     private String firstTeamName;
     private String secondTeamName;
-    private boolean isLocked;
+    private String leagueID;
 
-    public Game(String firstTeamName, String secondTeamName, boolean isLocked) {
+
+
+
+
+    //private boolean isLocked = false;
+
+    public Game(String firstTeamName, String secondTeamName, String leagueID) {
         this.firstTeamName = firstTeamName;
         this.secondTeamName = secondTeamName;
-        this.isLocked = isLocked;
+        this.leagueID = leagueID;
     }
 
     public Game() {
@@ -32,13 +41,53 @@ public class Game {
         this.secondTeamName = secondTeamName;
     }
 
-    public boolean isLocked() {
-        return isLocked;
+    //public boolean isLocked() {
+    //    return isLocked;
+    //}
+
+    //public void setLocked(boolean locked) {
+    //    isLocked = locked;
+    //}
+
+    public String getLeagueID() {
+        return this.leagueID;
     }
 
-    public void setLocked(boolean locked) {
-        isLocked = locked;
+    public void setLeagueID(String leagueID) {
+        this.leagueID = leagueID;
     }
 
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(firstTeamName);
+        dest.writeString(secondTeamName);
+        dest.writeString(leagueID);
+        //dest.writeBooleanArray(new boolean[] {isLocked});
+    }
+
+    private Game(Parcel in) {
+        //TODO: Make this less weird? maybe?
+        this.firstTeamName = in.readString();
+        this.secondTeamName = in.readString();
+        this.leagueID = in.readString();
+        //boolean[] tempArray = new boolean[1];
+        //in.readBooleanArray(tempArray);
+        //this.isLocked = tempArray[0];
+    }
+
+    public static final Parcelable.Creator<Game> CREATOR = new Parcelable.Creator<Game>() {
+        public Game createFromParcel(Parcel in) {
+            return new Game(in);
+        }
+
+        public Game[] newArray(int size) {
+            return new Game[size];
+        }
+    };
 }
