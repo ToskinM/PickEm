@@ -46,6 +46,12 @@
             android:text="@string/delete_league"
             android:textColor="@android:color/holo_red_dark" />
 
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/buttonBackToLeagues"
+            android:text="Back"/>
+
     </LinearLayout>
 
 
