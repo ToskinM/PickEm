@@ -27,10 +27,10 @@
     <string name="button_logOut">Log out</string>
 
     <string name="yourLeagues_activity_leagues">Your Leagues</string>
-    <string name="button_deleteLeague">Delete League</string>
-    <string name="button_cancel">Cancel</string>
 
     <string name="title_activity_league_options">Manage League</string>
-    <string name="rename">Rename</string>
-    <string name="delete">Delete</string>
+    <string name="button_cancel">Cancel</string>
+    <string name="add_game">Add Game</string>
+    <string name="rename">Rename League</string>
+    <string name="delete">Delete League</string>
 </resources>

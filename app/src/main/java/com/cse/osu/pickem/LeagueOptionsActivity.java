@@ -15,6 +15,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -39,6 +40,8 @@ public class LeagueOptionsActivity extends AppCompatActivity {
     private Button manageGamesButton;
     private Button renameLeagueButton;
     private Button deleteLeagueButton;
+    private AlertDialog renameDialog;
+    private AlertDialog deleteDialog;
 
     private DatabaseReference leagueDatabaseReference;
     private DatabaseReference leagueMembersDatabaseReference;
@@ -55,7 +58,7 @@ public class LeagueOptionsActivity extends AppCompatActivity {
         });
     }
 
-    protected void setupDeleteLeagueButton() {
+    protected AlertDialog createDeleteLeagueDialog() {
         // Build the confirmation dialog once, ahead of time
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Are you sure about that?")
@@ -70,16 +73,17 @@ public class LeagueOptionsActivity extends AppCompatActivity {
                         // Do nothing, cancelling delete
                     }
                 });
-        final AlertDialog deleteConfirmationDialog = builder.create();
+        return builder.create();
 
+        //final AlertDialog deleteConfirmationDialog = builder.create();
         // Wire button to show confirmation
-        deleteLeagueButton = findViewById(R.id.buttonDeleteLeague);
-        deleteLeagueButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                deleteConfirmationDialog.show();
-            }
-        });
+        //deleteLeagueButton = findViewById(R.id.buttonDeleteLeague);
+        //deleteLeagueButton.setOnClickListener(new View.OnClickListener() {
+        //    @Override
+        //    public void onClick(View v) {
+        //        deleteConfirmationDialog.show();
+        //    }
+        //});
     }
 
     protected void setupRenameLeagueButton() {
@@ -232,10 +236,11 @@ public class LeagueOptionsActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_league_options);
 
-        // Wire-up buttons
+
+        // Setup Dialogs
         setupAddGameButton();
-        setupRenameLeagueButton();
-        setupDeleteLeagueButton();
+        renameDialog = createRenameDialog();
+        deleteDialog = createDeleteLeagueDialog();
 
         // Display league's name at the top
         TextView leagueNameTextView = findViewById(R.id.textViewLeagueName);
@@ -251,5 +256,22 @@ public class LeagueOptionsActivity extends AppCompatActivity {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.edit_league_options, menu);
         return true;
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch (id){
+            case R.id.action_addGame:
+                // Add Game here
+                return true;
+            case R.id.action_rename:
+                renameDialog.show();
+                return true;
+            case R.id.action_delete:
+                deleteDialog.show();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 }
