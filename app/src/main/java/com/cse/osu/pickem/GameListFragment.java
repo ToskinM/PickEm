@@ -25,7 +25,7 @@ public class GameListFragment extends Fragment {
     private RecyclerView mGameRecyclerView;
     private DatabaseReference leaguesDatabaseReference;
     private GameAdapter mAdapter;
-    private FirebaseAuth auth;
+    private String mLeagueID;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -36,11 +36,13 @@ public class GameListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_game_list, container, false);
 
-        // Get user auth data
-        auth = FirebaseAuth.getInstance();
+        // Get leagueID from launching activity
+        if (getArguments() != null){
+            mLeagueID = getArguments().getString("leagueID");
+        }
 
         // Setup recycler view
-        mGameRecyclerView = view.findViewById(R.id.crime_recycler_view);
+        mGameRecyclerView = view.findViewById(R.id.game_recycler_view);
         mGameRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         // Setup Listeners
@@ -61,8 +63,7 @@ public class GameListFragment extends Fragment {
 
     private void updateUI() {
         // Get user's owned leagues
-        UserGameFetcher userGameFetcherFetcher = UserGameFetcher.get(getActivity(), auth);
-        userGameFetcherFetcher.updateUsersLeagues();
+        UserGameFetcher userGameFetcherFetcher = UserGameFetcher.get(getActivity(), mLeagueID);
         List<Game> games = userGameFetcherFetcher.getGames();
 
         mAdapter = new GameAdapter(games);
@@ -104,9 +105,9 @@ public class GameListFragment extends Fragment {
         private Game mGame;
 
         public GameHolder(LayoutInflater inflater, ViewGroup parent) {
-            super(inflater.inflate(R.layout.list_item_league, parent, false));
+            super(inflater.inflate(R.layout.list_item_game, parent, false));
             itemView.setOnClickListener(this);
-            mGameTextView = itemView.findViewById(R.id.league_name);
+            mGameTextView = itemView.findViewById(R.id.game_name);
 
         }
         public void bind(Game game) {
