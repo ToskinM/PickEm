@@ -17,7 +17,7 @@
         <activity
             android:name=".HomeActivity"
             android:label="@string/title_activity_home"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".LeagueActivity"
             android:label="@string/title_activity_leagues"
@@ -43,6 +43,10 @@
         <activity
             android:name=".LeagueOptionsActivity"
             android:label="@string/title_activity_league_options"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".GameOptionsActivity"
+            android:label="@string/title_activity_game_options"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 

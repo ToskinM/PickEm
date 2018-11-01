@@ -1,6 +1,7 @@
 package com.cse.osu.pickem;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -128,10 +129,10 @@ public class GameListFragment extends Fragment {
             //AlertDialog leagueActionsDialog = createLeagueActionsDialog();
             //leagueActionsDialog.show();
 
-            // Launch league options activity, sending the League to manage via the intent
-            //Intent intent = new Intent(getActivity(), LeagueOptionsActivity.class);
-            //intent.putExtra("league", mGame);
-            //startActivity(intent);
+            //Launch league options activity, sending the League to manage via the intent
+            Intent intent = new Intent(getActivity(), GameOptionsActivity.class);
+            intent.putExtra("game", mGame);
+            startActivity(intent);
         }
     }
 
