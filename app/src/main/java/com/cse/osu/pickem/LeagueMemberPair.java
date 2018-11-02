@@ -3,10 +3,18 @@ package com.cse.osu.pickem;
 public class LeagueMemberPair {
     private String UID;
     private String LeagueID;
+    private int Points;
 
-    public LeagueMemberPair(String UIDIn, String leagueIdIn) {
+    public LeagueMemberPair(String UIDIn, String leagueIdIn, int points) {
         UID = UIDIn;
         LeagueID = leagueIdIn;
+        Points = points;
+    }
+
+    public LeagueMemberPair(String UIDIn, String leagueIDin) {
+        UID = UIDIn;
+        LeagueID = leagueIDin;
+        Points = 0;
     }
 
     public LeagueMemberPair() {
@@ -40,6 +48,8 @@ public class LeagueMemberPair {
         return LeagueID;
     }
 
+    public int getPoints() { return Points; }
+
     public void setUID(String UID) {
         this.UID = UID;
     }
@@ -47,4 +57,6 @@ public class LeagueMemberPair {
     public void setLeagueID(String leagueID) {
         LeagueID = leagueID;
     }
+
+    public void setPoints(int newPoints) { Points = newPoints; }
 }
