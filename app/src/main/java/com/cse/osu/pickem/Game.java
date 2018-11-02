@@ -80,16 +80,20 @@ public class Game implements Parcelable {
         dest.writeString(firstTeamName);
         dest.writeString(secondTeamName);
         dest.writeString(leagueID);
-        //dest.writeBooleanArray(new boolean[] {isLocked});
+        dest.writeBooleanArray(new boolean[] {isLocked});
     }
 
     private Game(Parcel in) {
         this.firstTeamName = in.readString();
         this.secondTeamName = in.readString();
         this.leagueID = in.readString();
-        //boolean[] tempArray = new boolean[1];
-        //in.readBooleanArray(tempArray);
-        //this.isLocked = tempArray[0];
+        boolean[] temp = new boolean[1];
+        in.readBooleanArray(temp);
+        this.isLocked = temp[0];
+    }
+
+    public void endGame() {
+        isLocked = true;
     }
 
     public static final Parcelable.Creator<Game> CREATOR = new Parcelable.Creator<Game>() {

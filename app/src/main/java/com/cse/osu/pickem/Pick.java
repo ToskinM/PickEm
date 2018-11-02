@@ -89,4 +89,23 @@ public class Pick implements Parcelable {
             return new Pick[size];
         }
     };
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        }
+
+        if (!(o instanceof Pick)) {
+            return false;
+        }
+
+        Pick testPick = (Pick) o;
+
+        if (UserID.equals(testPick.UserID) && GameID.equals(testPick.GameID) && TeamAScore == testPick.TeamAScore && TeamBScore == testPick.TeamBScore) {
+            return true;
+        }
+
+        return false;
+    }
 }
