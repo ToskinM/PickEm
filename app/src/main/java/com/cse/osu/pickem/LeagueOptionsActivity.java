@@ -91,6 +91,8 @@ public class LeagueOptionsActivity extends AppCompatActivity {
     }
 
     protected void addGame(Game gameIn) {
+        DatabaseReference tempReference = gameDatabaseReference.push();
+        gameIn.setGameID(tempReference.getKey());
         gameDatabaseReference.push().setValue(gameIn);
     }
 

@@ -68,10 +68,13 @@ public class GameOptionsActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         Dialog d = (Dialog) dialog;
 
+                        if (mGame == null) {
+                            Log.d("PickEm", "mGame is null!");
+                        }
 
                         int teamAScore = Integer.parseInt(((EditText)d.findViewById(R.id.teamA_prediction_text)).getText().toString().trim());
                         int teamBScore = Integer.parseInt(((EditText)d.findViewById(R.id.teamB_prediction_text)).getText().toString().trim());
-                        Pick myPick = new Pick(auth.getUid(), mGame.getFirstTeamName() + mGame.getSecondTeamName(), teamAScore, teamBScore);
+                        Pick myPick = new Pick(auth.getUid(), mGame.getGameID(), teamAScore, teamBScore);
                         addPick(myPick);
 
 
