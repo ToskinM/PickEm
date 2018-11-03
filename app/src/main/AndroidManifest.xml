@@ -47,7 +47,8 @@
         <activity
             android:name=".GameOptionsActivity"
             android:label="@string/title_activity_game_options"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".ProfileActivity"></activity>
     </application>
 
 </manifest>

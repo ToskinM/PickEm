@@ -29,6 +29,13 @@
             android:id="@+id/button_logOut"/>
 
         <Button
+            android:id="@+id/button_myProfile"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="15dp"
+            android:text="@string/button_myProfile" />
+
+        <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/button_deleteAccount"
