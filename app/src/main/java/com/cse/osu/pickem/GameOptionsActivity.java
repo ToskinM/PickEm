@@ -24,11 +24,12 @@ import com.google.firebase.database.FirebaseDatabase;
 public class GameOptionsActivity extends AppCompatActivity {
 
     private Button addPickButton;
-    private DatabaseReference gameDatabaseReference;
+    private Button endGameButton;
     private DatabaseReference pickDatabaseReference;
     private FirebaseAuth auth;
     private Game mGame;
     private AlertDialog addPickDialog;
+    private AlertDialog endGameDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +39,7 @@ public class GameOptionsActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         addPickButton = findViewById(R.id.buttonMakePick);
-        gameDatabaseReference = FirebaseDatabase.getInstance().getReference("games");
+        endGameButton = findViewById(R.id.buttonEndGame);
         pickDatabaseReference = FirebaseDatabase.getInstance().getReference("picks");
         auth = FirebaseAuth.getInstance();
 
@@ -48,9 +49,16 @@ public class GameOptionsActivity extends AppCompatActivity {
                 addPickDialog.show();
             }
         });
+        endGameButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                endGameDialog.show();
+            }
+        });
 
         Intent creatorIntent = getIntent();
         addPickDialog = addPickDialog();
+        endGameDialog = endGameDialog();
         mGame = creatorIntent.getParcelableExtra("game");
     }
 
@@ -78,6 +86,32 @@ public class GameOptionsActivity extends AppCompatActivity {
                         addPick(myPick);
 
 
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //Nothing
+                    }
+                });
+
+        return builder.create();
+    }
+
+    protected AlertDialog endGameDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("End Gmae?");
+        LayoutInflater inflater = GameOptionsActivity.this.getLayoutInflater();
+        builder.setView(inflater.inflate(R.layout.dialog_game_endgame, null))
+                .setPositiveButton("Create", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Dialog d = (Dialog) dialog;
+                        EditText actualAScore = d.findViewById(R.id.teamA_actualScore_text);
+                        EditText actualBScore = d.findViewById(R.id.teamB_actualScore_text);
+                        int aScore = Integer.parseInt(actualAScore.getText().toString().trim());
+                        int bScore = Integer.parseInt(actualBScore.getText().toString().trim());
+                        mGame.endGame(mGame.getGameID(), aScore, bScore);
                     }
                 })
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {

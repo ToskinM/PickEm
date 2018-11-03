@@ -13,7 +13,9 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Game implements Parcelable {
 
@@ -49,8 +51,49 @@ public class Game implements Parcelable {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Pick tempPick = snapshot.getValue(Pick.class);
-                    if (tempPick.getGameID().equals(gameID)) {
-                        loadedPicks.add(tempPick);
+                    calculatePoints(tempPick, teamAFinalScore, teamBFinalScore);
+                    DatabaseReference gamesReference = FirebaseDatabase.getInstance().getReference("games");
+                    gamesReference = gamesReference.child(gameID);
+                    gamesReference.getParent().removeValue();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+    }
+
+    protected void calculatePoints(final Pick pick, int actualScoreA, int actualScoreB) {
+        boolean teamAWon = actualScoreA > actualScoreB;
+        int actualMargin = Math.abs(actualScoreA - actualScoreB);
+        int guessMargin = Math.abs(pick.getTeamAScore() - pick.getTeamBScore());
+        int pointsWon = Math.abs(actualMargin - guessMargin);
+
+        if ((teamAWon && pick.getTeamAScore() > pick.getTeamBScore()) ||
+                (!teamAWon && pick.getTeamAScore() > pick.getTeamBScore())) {
+            pointsWon = 300 - pointsWon;
+        } else {
+            pointsWon = 0;
+        }
+
+        final int finalNewPoints = pointsWon;
+
+        leagueMemberReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    LeagueMemberPair pair = snapshot.getValue(LeagueMemberPair.class);
+                    if (pair.getUID().equals(pick.getUserID())) {
+                        String key = snapshot.getKey();
+                        int newPoints = pair.getPoints() + finalNewPoints;
+                        Map<String, Object> newMap = new HashMap<>();
+                        pair.setPoints(newPoints);
+                        LeagueMemberPair newPair = pair;
+                        newMap.put(key, newPair);
+                        snapshot.getRef().getParent().updateChildren(newMap);
                     }
                 }
             }
