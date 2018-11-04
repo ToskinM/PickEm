@@ -22,7 +22,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -39,7 +38,6 @@ public class LeagueOptionsActivity extends AppCompatActivity {
     public static final String TAG = "LeagueOptionsActivity";
 
     private Button addGameButton;
-    private Button manageGamesButton;
     private Button renameLeagueButton;
     private Button deleteLeagueButton;
     private Button backButton;
@@ -93,7 +91,7 @@ public class LeagueOptionsActivity extends AppCompatActivity {
     protected void addGame(Game gameIn) {
         DatabaseReference tempReference = gameDatabaseReference.push();
         gameIn.setGameID(tempReference.getKey());
-        gameDatabaseReference.push().setValue(gameIn);
+        tempReference.setValue(gameIn);
     }
 
     protected AlertDialog createDeleteLeagueDialog() {
@@ -172,34 +170,7 @@ public class LeagueOptionsActivity extends AppCompatActivity {
     }
 
     protected void renameLeague(final String leagueID, final String newName) {
-        leagueDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    League snapshotLeague = snapshot.getValue(League.class);
-
-                    //If current user owns the league, and the league being examined is the target,
-                    if (snapshotLeague.getLeagueOwnerUID().equals(auth.getUid()) && snapshotLeague.getLeagueID().equals(leagueID)) {
-
-                        //Create a new map to pass into updateChildren()
-                        Map<String, Object> childrenMap = new HashMap<>();
-
-                        //Add the league we want to change as the key, and the new League as the value
-                        childrenMap.put(snapshotLeague.getLeagueID(), new League(newName, snapshotLeague.getLeagueID(), snapshotLeague.getLeagueOwnerUID()));
-
-                        //Now actually update
-                        snapshot.getRef().getParent().updateChildren(childrenMap);
-                    }
-                }
-                TextView leagueNameTextView = findViewById(R.id.textViewLeagueName);
-                leagueNameTextView.setText(newName);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
+        leagueDatabaseReference.child(leagueID).child("leagueName").setValue(newName);
     }
 
     private void deleteLeague() {
@@ -307,6 +278,14 @@ public class LeagueOptionsActivity extends AppCompatActivity {
         renameDialog = createRenameDialog();
         deleteDialog = createDeleteLeagueDialog();
 
+        deleteLeagueButton = findViewById(R.id.buttonDeleteLeague);
+        deleteLeagueButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                deleteDialog.show();
+            }
+        });
+
         // Display league's name at the top
         TextView leagueNameTextView = findViewById(R.id.textViewLeagueName);
         leagueNameTextView.setText(mLeague.getLeagueName());
@@ -327,7 +306,7 @@ public class LeagueOptionsActivity extends AppCompatActivity {
         int id = item.getItemId();
         switch (id){
             case R.id.action_addGame:
-                // Add Game here
+                //wut
             case R.id.action_rename:
                 renameDialog.show();
             case R.id.action_delete:
