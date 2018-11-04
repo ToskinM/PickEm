@@ -27,6 +27,13 @@
             android:layout_margin="15dp"/>
 
         <EditText
+            android:id="@+id/usernameText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="15dp"
+            android:hint="@string/username_editText_login" />
+
+        <EditText
             android:id="@+id/emailPasswordText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

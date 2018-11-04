@@ -2,6 +2,8 @@ package com.cse.osu.pickem;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -17,6 +19,11 @@ import android.graphics.Color;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class Settings extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
@@ -152,13 +159,36 @@ public class Settings extends AppCompatActivity
             auth.signOut();
             startActivity(new Intent(getApplicationContext(), LoginActivity.class));
         } else if (v == deleteAccountButton) {
-            FirebaseUser user = auth.getCurrentUser();
-            auth.signOut();
-            user.delete();
-
-            startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+            deleteUserProfile();
         } else if (v == button_myProfile) {
             startActivity(new Intent(getApplicationContext(), ProfileActivity.class));
         }
+    }
+
+    private void deleteUserProfile(){
+        final DatabaseReference profilesDatabaseReference = FirebaseDatabase.getInstance().getReference("profiles");
+        profilesDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Profile snapshotProfile = snapshot.getValue(Profile.class);
+                    if (snapshotProfile.getUserID().equals(auth.getUid())) {
+                        profilesDatabaseReference.child(snapshotProfile.getUserID()).removeValue(new DatabaseReference.CompletionListener() {
+                            @Override
+                            public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
+                                FirebaseUser user = auth.getCurrentUser();
+                                auth.signOut();
+                                user.delete();
+                                startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+                            }
+                        });
+                    }
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 }

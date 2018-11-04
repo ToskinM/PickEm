@@ -34,8 +34,11 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -46,28 +49,42 @@ import java.io.IOException;
 import java.util.Date;
 
 public class ProfileActivity extends AppCompatActivity {
+    public static final String TAG = "ProfileActivity";
+    static final int REQUEST_IMAGE_CAPTURE = 1;
+    static final int REQUEST_TAKE_PHOTO = 1;
+
     private FirebaseAuth auth;
     private DatabaseReference profileDatabaseReference;
-    public static final String TAG = "ProfileActivity";
+
     private Button pictureChangeButton;
+    private Button usernameChangeButton;
     private TextView userNameTextView;
     private ImageView profileImageView;
 
-    static final int REQUEST_IMAGE_CAPTURE = 1;
-    static final int REQUEST_TAKE_PHOTO = 1;
     private String mCurrentPhotoPath;
+    private Bitmap profilePhoto;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
+        // Init database refs
         auth = FirebaseAuth.getInstance();
         profileDatabaseReference = FirebaseDatabase.getInstance().getReference("profiles");
 
+        // Wire up views
         profileImageView = findViewById(R.id.imageView_profilePic);
-
+        userNameTextView = findViewById(R.id.textView_userName);
         pictureChangeButton = findViewById(R.id.button_changePicture);
+        usernameChangeButton = findViewById(R.id.button_changeUsername);
+        setupButtonListeners();
+
+        updateProfileInfo();
+
+    }
+
+    protected void setupButtonListeners() {
         pictureChangeButton.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -89,15 +106,17 @@ public class ProfileActivity extends AppCompatActivity {
                         return true;
                     }
                 });
-
-                popup.show();//showing popup menu
+                popup.show();
             }
         });
+        usernameChangeButton.setOnClickListener(new View.OnClickListener() {
 
-        profileImageView = findViewById(R.id.imageView_profilePic);
-
-        userNameTextView = findViewById(R.id.textView_userName);
-        userNameTextView.setText(auth.getCurrentUser().getUid());
+            @Override
+            public void onClick(View v) {
+                AlertDialog renameDialog = createRenameDialog();
+                renameDialog.show();
+            }
+        });
     }
 
     private void dispatchTakePictureIntent() {
@@ -155,6 +174,7 @@ public class ProfileActivity extends AppCompatActivity {
             String imageEncoded = Base64.encodeToString(baos.toByteArray(), Base64.DEFAULT);
             profileDatabaseReference
                     .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                    .child("encodedProflePicture")
                     .setValue(imageEncoded);
         }
     }
@@ -186,9 +206,62 @@ public class ProfileActivity extends AppCompatActivity {
         encodeBitmapAndSaveToFirebase(bitmap);
     }
 
-    public void onClick(View v) throws NullPointerException{
-        if (v == pictureChangeButton) {
-            openContextMenu(pictureChangeButton);
-        }
+    protected void updateProfileInfo() {
+        FirebaseDatabase.getInstance().getReference("profiles").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for(DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Profile tempProfile = snapshot.getValue(Profile.class);
+                    if (tempProfile.getUserID().equals(auth.getUid())) {
+                        // Get and decode profile image
+                        byte[] decodedByteArray = android.util.Base64.decode(tempProfile.getEncodedProflePicture(), Base64.DEFAULT);
+                        profilePhoto = BitmapFactory.decodeByteArray(decodedByteArray, 0, decodedByteArray.length);
+                        profileImageView.setImageBitmap(profilePhoto);
+
+                        // Display Username
+                        userNameTextView.setText(tempProfile.getUserName());
+                        break;
+                    }
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+            }
+        });
+    }
+
+    private AlertDialog createRenameDialog(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(ProfileActivity.this);
+        // Get the layout inflater
+        LayoutInflater inflater = ProfileActivity.this.getLayoutInflater();
+        // Inflate and set the layout for the dialog
+        // Pass null as the parent view because its going in the dialog layout
+        builder.setView(inflater.inflate(R.layout.dialog_username_change, null))
+                // Add action buttons
+                .setPositiveButton("Change", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        Dialog d = (Dialog) dialog;
+
+                        // Get new name for league
+                        EditText newNameEditText = d.findViewById(R.id.new_username);
+                        String newName = newNameEditText.getText().toString().trim();
+
+                        // Rename the league
+                        changeUsername(newName);
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        // Do nothing, cancelling rename
+                    }
+                });
+        return builder.create();
+    }
+    private void changeUsername(String newName){
+        profileDatabaseReference
+                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .child("userName")
+                .setValue(newName);
     }
 }
