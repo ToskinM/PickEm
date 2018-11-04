@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/action_takePhoto"
+        android:orderInCategory="100"
+        android:title="@string/changePicture_take"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_chooseAvatar"
+        android:orderInCategory="100"
+        android:title="@string/changePicture_avatar"
+        app:showAsAction="never" />
+</menu>

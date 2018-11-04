@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -17,22 +18,31 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener{
 
     private Button registerButton;
     private Button loginButton;
     private EditText email;
+    private EditText username;
     private EditText password;
 
     private FirebaseAuth auth;
+    private DatabaseReference profilesDatabaseReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         auth = FirebaseAuth.getInstance();
+        profilesDatabaseReference = FirebaseDatabase.getInstance().getReference("profiles");
 
         if (auth.getCurrentUser() != null) {
+            checkForUserProfile();
             finish();
             startActivity(new Intent(getApplicationContext(), HomeActivity.class));
         }
@@ -44,11 +54,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
 
 
-        registerButton = (Button) findViewById(R.id.buttonSubmit);
-        loginButton = (Button) findViewById(R.id.buttonLogIn);
+        registerButton = findViewById(R.id.buttonSubmit);
+        loginButton = findViewById(R.id.buttonLogIn);
 
-        email = (EditText) findViewById(R.id.emailEditText);
-        password = (EditText) findViewById(R.id.emailPasswordText);
+        email = findViewById(R.id.emailEditText);
+        username = findViewById(R.id.usernameText);
+        password = findViewById(R.id.emailPasswordText);
 
         registerButton.setOnClickListener(this);
         loginButton.setOnClickListener(this);
@@ -110,15 +121,13 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             return;
         }
 
-
-
         auth.createUserWithEmailAndPassword(emailText, passwordText).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()) {
+                    createUserProfile();
                     Toast.makeText(LoginActivity.this, "Success!", Toast.LENGTH_SHORT).show();
                 } else {
-
                     try {
                         throw task.getException();
 
@@ -134,5 +143,38 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 }
             }
         });
+    }
+
+    private void checkForUserProfile() {
+        profilesDatabaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                boolean inDatabase = false;
+                for(DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Profile tempProfile = snapshot.getValue(Profile.class);
+                    if (tempProfile.getUserID().equals(auth.getUid())) {
+                        inDatabase = true;
+                        break;
+                    }
+                }
+                if (!inDatabase){
+                    createUserProfile();
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+            }
+        });
+
+    }
+
+    private void createUserProfile() {
+        String usernameString = username.getText().toString().trim();
+        if (usernameString.equals(""))
+            usernameString = auth.getUid();
+        Profile newUserProfile = new Profile(auth.getUid(), usernameString);
+        profilesDatabaseReference
+                .child(auth.getUid())
+                .setValue(newUserProfile);
     }
 }

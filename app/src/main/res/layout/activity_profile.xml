@@ -7,24 +7,48 @@
     tools:context=".ProfileActivity">
 
     <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:id="@+id/linearLayout3"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:gravity="center"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <ImageView
-            android:id="@+id/imageView3"
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/textView_userName"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:textAlignment="center"
+            android:textSize="30sp"
+            app:layout_constraintBottom_toTopOf="@+id/linearLayout3"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Username" />
+
+        <ImageView
+            android:id="@+id/imageView_profilePic"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:contentDescription="Profile Picture"
+            android:scaleType="centerInside"
             tools:srcCompat="@tools:sample/avatars" />
 
         <Button
-            android:id="@+id/button2"
+            android:id="@+id/button_changePicture"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Button" />
+            android:text="@string/button_changePicture" />
+
+        <Button
+            android:id="@+id/button_changeUsername"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/button_changeUsername" />
     </LinearLayout>
+
 </android.support.constraint.ConstraintLayout>

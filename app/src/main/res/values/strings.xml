@@ -19,6 +19,7 @@
     <string name="title_activity_login">PickEm</string>
 
     <string name="email_editText_login">Enter Email Address</string>
+    <string name="username_editText_login">Enter Username</string>
     <string name="password_editText_login">Enter Password</string>
     <string name="button_submit">Submit</string>
     <string name="button_deleteAccount">Delete account</string>
@@ -42,4 +43,7 @@
 
     <string name="title_activity_profile">ProfileActivity</string>
     <string name="button_changePicture">Change Picture</string>
+    <string name="button_changeUsername">Change Username</string>
+    <string name="changePicture_take">Take Picture</string>
+    <string name="changePicture_avatar">Choose Avatar</string>
 </resources>

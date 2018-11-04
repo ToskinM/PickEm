@@ -2,6 +2,8 @@ package com.cse.osu.pickem;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -17,6 +19,11 @@ import android.graphics.Color;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class Settings extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
@@ -24,6 +31,7 @@ public class Settings extends AppCompatActivity
     public static final String TAG = "PickEm";
     private Button logoutButton;
     private Button deleteAccountButton;
+    private Button button_myProfile;
     private FirebaseAuth auth;
 
     @Override
@@ -61,32 +69,35 @@ public class Settings extends AppCompatActivity
         super.onCreate(savedInstanceState);
         Log.d(TAG, "Settings: onCreate() called!");
         setContentView(R.layout.activity_settings);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        logoutButton = (Button) findViewById(R.id.button_logOut);
+        logoutButton = findViewById(R.id.button_logOut);
         logoutButton.setOnClickListener(this);
 
-        deleteAccountButton = (Button) findViewById(R.id.button_deleteAccount);
+        button_myProfile = findViewById(R.id.button_myProfile);
+        button_myProfile.setOnClickListener(this);
+
+        deleteAccountButton = findViewById(R.id.button_deleteAccount);
         deleteAccountButton.setOnClickListener(this);
         deleteAccountButton.setBackgroundColor(Color.RED);
 
         auth = FirebaseAuth.getInstance();
 
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
     }
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -136,7 +147,7 @@ public class Settings extends AppCompatActivity
             startActivity(intent);
         }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
@@ -148,11 +159,36 @@ public class Settings extends AppCompatActivity
             auth.signOut();
             startActivity(new Intent(getApplicationContext(), LoginActivity.class));
         } else if (v == deleteAccountButton) {
-            FirebaseUser user = auth.getCurrentUser();
-            auth.signOut();
-            user.delete();
-
-            startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+            deleteUserProfile();
+        } else if (v == button_myProfile) {
+            startActivity(new Intent(getApplicationContext(), ProfileActivity.class));
         }
+    }
+
+    private void deleteUserProfile(){
+        final DatabaseReference profilesDatabaseReference = FirebaseDatabase.getInstance().getReference("profiles");
+        profilesDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Profile snapshotProfile = snapshot.getValue(Profile.class);
+                    if (snapshotProfile.getUserID().equals(auth.getUid())) {
+                        profilesDatabaseReference.child(snapshotProfile.getUserID()).removeValue(new DatabaseReference.CompletionListener() {
+                            @Override
+                            public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
+                                FirebaseUser user = auth.getCurrentUser();
+                                auth.signOut();
+                                user.delete();
+                                startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+                            }
+                        });
+                    }
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 }
