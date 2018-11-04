@@ -33,10 +33,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 public class LeagueActivity extends AppCompatActivity
@@ -379,7 +377,7 @@ public class LeagueActivity extends AppCompatActivity
             Intent intent = new Intent(this, LeagueActivity.class);
             startActivity(intent);
         } else if (id == R.id.nav_people) {
-            Intent intent = new Intent(this, People.class);
+            Intent intent = new Intent(this, PeopleActivity.class);
             startActivity(intent);
         } else if (id == R.id.nav_settings) {
             Intent intent = new Intent(this, Settings.class);

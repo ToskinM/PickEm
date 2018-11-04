@@ -12,7 +12,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
-public class People extends AppCompatActivity
+public class PeopleActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     public static final String TAG = "PickEm";
@@ -20,37 +20,37 @@ public class People extends AppCompatActivity
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.d(TAG, "People: onDestroy() called!");
+        Log.d(TAG, "PeopleActivity: onDestroy() called!");
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        Log.d(TAG, "People: onResume() called!");
+        Log.d(TAG, "PeopleActivity: onResume() called!");
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        Log.d(TAG, "People: onStart() called!");
+        Log.d(TAG, "PeopleActivity: onStart() called!");
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        Log.d(TAG, "People: onStop() called!");
+        Log.d(TAG, "PeopleActivity: onStop() called!");
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        Log.d(TAG, "People: onPause() called!");
+        Log.d(TAG, "PeopleActivity: onPause() called!");
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(TAG, "People: onCreate() called!");
+        Log.d(TAG, "PeopleActivity: onCreate() called!");
         setContentView(R.layout.activity_people);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -111,7 +111,7 @@ public class People extends AppCompatActivity
             Intent intent = new Intent(this, LeagueActivity.class);
             startActivity(intent);
         } else if (id == R.id.nav_people) {
-            Intent intent = new Intent(this, People.class);
+            Intent intent = new Intent(this, PeopleActivity.class);
             startActivity(intent);
         } else if (id == R.id.nav_settings) {
             Intent intent = new Intent(this, Settings.class);

@@ -100,7 +100,6 @@ public class ProfileActivity extends AppCompatActivity {
                         switch (id){
                             case R.id.action_takePhoto:
                                 dispatchTakePictureIntent();
-
                             case R.id.action_chooseAvatar:
                         }
                         return true;
@@ -129,7 +128,7 @@ public class ProfileActivity extends AppCompatActivity {
                 photoFile = createImageFile();
             } catch (IOException ex) {
                 // Error occurred while creating the File
-                Snackbar.make(ProfileActivity.this.findViewById(android.R.id.content), "Error creating image file.", Snackbar.LENGTH_LONG)
+                Snackbar.make(ProfileActivity.this.findViewById(android.R.id.content), "Unable to create image file.", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
             // Continue only if the File was successfully created
@@ -160,10 +159,8 @@ public class ProfileActivity extends AppCompatActivity {
                 ".jpg",         /* suffix */
                 storageDir      /* directory */
         );
-
         // Save a file: path for use with ACTION_VIEW intents
         mCurrentPhotoPath = image.getAbsolutePath();
-        Log.d(TAG, mCurrentPhotoPath);
         return image;
     }
 
@@ -177,9 +174,6 @@ public class ProfileActivity extends AppCompatActivity {
                     .child("encodedProflePicture")
                     .setValue(imageEncoded);
         }
-    }
-    private void getPictureFromDatabase() {
-
     }
 
     private void setPic() {

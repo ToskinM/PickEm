@@ -2,8 +2,6 @@ package com.cse.osu.pickem;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -127,7 +125,7 @@ public class HomeActivity extends AppCompatActivity
             Intent intent = new Intent(this, LeagueActivity.class);
             startActivity(intent);
         } else if (id == R.id.nav_people) {
-            Intent intent = new Intent(this, People.class);
+            Intent intent = new Intent(this, PeopleActivity.class);
             startActivity(intent);
         } else if (id == R.id.nav_settings) {
             Intent intent = new Intent(this, Settings.class);
