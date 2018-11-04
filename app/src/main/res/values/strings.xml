@@ -42,4 +42,6 @@
 
     <string name="title_activity_profile">ProfileActivity</string>
     <string name="button_changePicture">Change Picture</string>
+    <string name="changePicture_take">Take Picture</string>
+    <string name="changePicture_avatar">Choose Avatar</string>
 </resources>

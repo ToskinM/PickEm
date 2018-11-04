@@ -24,6 +24,7 @@ public class Settings extends AppCompatActivity
     public static final String TAG = "PickEm";
     private Button logoutButton;
     private Button deleteAccountButton;
+    private Button button_myProfile;
     private FirebaseAuth auth;
 
     @Override
@@ -61,32 +62,35 @@ public class Settings extends AppCompatActivity
         super.onCreate(savedInstanceState);
         Log.d(TAG, "Settings: onCreate() called!");
         setContentView(R.layout.activity_settings);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        logoutButton = (Button) findViewById(R.id.button_logOut);
+        logoutButton = findViewById(R.id.button_logOut);
         logoutButton.setOnClickListener(this);
 
-        deleteAccountButton = (Button) findViewById(R.id.button_deleteAccount);
+        button_myProfile = findViewById(R.id.button_myProfile);
+        button_myProfile.setOnClickListener(this);
+
+        deleteAccountButton = findViewById(R.id.button_deleteAccount);
         deleteAccountButton.setOnClickListener(this);
         deleteAccountButton.setBackgroundColor(Color.RED);
 
         auth = FirebaseAuth.getInstance();
 
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
     }
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -136,7 +140,7 @@ public class Settings extends AppCompatActivity
             startActivity(intent);
         }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
@@ -153,6 +157,8 @@ public class Settings extends AppCompatActivity
             user.delete();
 
             startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+        } else if (v == button_myProfile) {
+            startActivity(new Intent(getApplicationContext(), ProfileActivity.class));
         }
     }
 }
