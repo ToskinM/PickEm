@@ -58,7 +58,7 @@ public class Pick implements Parcelable {
     }
 
     public Pick() {
-        //Necessary for technical reasons
+
     }
 
     public void changePick(int teamAScore, int teamBScore) {

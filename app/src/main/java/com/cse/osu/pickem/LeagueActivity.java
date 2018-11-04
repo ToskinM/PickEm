@@ -74,7 +74,7 @@ public class LeagueActivity extends AppCompatActivity
                     //Set up new league, and add it to firebase
                     League newLeague = new League(name, id, auth.getCurrentUser().getUid());
                     leaguesDatabaseReference.child(id).setValue(newLeague);
-                    Toast.makeText(LeagueActivity.this, newLeague.getLeagueName(), Toast.LENGTH_SHORT).show();
+                    leagueMemberDatabaseReference.push().setValue(new LeagueMemberPair(auth.getUid(), newLeague.getLeagueID()));
                 } else {
                     //Error handling
                     AlertDialog alertDialog = new AlertDialog.Builder(LeagueActivity.this).create();

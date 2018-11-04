@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -28,7 +29,6 @@ public class GameListFragment extends Fragment {
     private DatabaseReference leaguesDatabaseReference;
     private GameAdapter mAdapter;
     private String mLeagueID;
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -122,12 +122,6 @@ public class GameListFragment extends Fragment {
         // When you click a game in the list
         @Override
         public void onClick(View view) {
-            //// Show league options popup dialog
-            //Toast.makeText(getActivity(),
-            //        "Owned by: " + mGame.getLeagueOwnerUID(), Toast.LENGTH_SHORT)
-            //        .show();
-            //AlertDialog leagueActionsDialog = createLeagueActionsDialog();
-            //leagueActionsDialog.show();
 
             //Launch league options activity, sending the League to manage via the intent
             Intent intent = new Intent(getActivity(), GameOptionsActivity.class);

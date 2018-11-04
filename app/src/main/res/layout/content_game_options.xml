@@ -22,8 +22,15 @@
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:text="Edit pick"
+            android:id="@+id/buttonEditPick"/>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:text="End game"
             android:id="@+id/buttonEndGame"/>
+
 
     </LinearLayout>
 
