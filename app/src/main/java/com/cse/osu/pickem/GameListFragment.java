@@ -26,7 +26,6 @@ import java.util.List;
 public class GameListFragment extends Fragment {
     public static final String TAG = "GameListFragment";
     private RecyclerView mGameRecyclerView;
-    private DatabaseReference leaguesDatabaseReference;
     private GameAdapter mAdapter;
     private String mLeagueID;
     @Override
@@ -66,9 +65,8 @@ public class GameListFragment extends Fragment {
 
     private void updateUI() {
         // Get user's owned leagues
-        UserGameFetcher userGameFetcher = UserGameFetcher.get(getActivity(), mLeagueID);
-        userGameFetcher.setLeague(mLeagueID);
-        List<Game> games = userGameFetcher.getGames();
+        UserGameFetcher userGameFetcher = UserGameFetcher.get(getActivity());
+        List<Game> games = userGameFetcher.getGames(mLeagueID);
 
         mAdapter = new GameAdapter(games);
         mGameRecyclerView.removeAllViews();
@@ -78,21 +76,8 @@ public class GameListFragment extends Fragment {
 
     private void setupDatabaseListeners(){
         // Get database references
-        DatabaseReference leaguesDatabaseReference = FirebaseDatabase.getInstance().getReference("leagues");
-        DatabaseReference leagueMemberDatabaseReference = FirebaseDatabase.getInstance().getReference("leagueMembers");
-
-        // League Members listener
-        leagueMemberDatabaseReference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                updateUI();
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-            }
-        });
-        // Leagues listener
-        leaguesDatabaseReference.addValueEventListener(new ValueEventListener() {
+        DatabaseReference gamesDatabaseReference = FirebaseDatabase.getInstance().getReference("games");
+        gamesDatabaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 updateUI();
