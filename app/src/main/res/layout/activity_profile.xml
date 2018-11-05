@@ -35,6 +35,7 @@
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:contentDescription="Profile Picture"
+            android:rotation="0"
             android:scaleType="centerInside"
             tools:srcCompat="@tools:sample/avatars" />
 

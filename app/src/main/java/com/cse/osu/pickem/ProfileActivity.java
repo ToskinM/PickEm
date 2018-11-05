@@ -3,6 +3,8 @@ package com.cse.osu.pickem;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -105,7 +107,9 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void dispatchTakePictureIntent() {
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT);
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        savePreferences();
         // Ensure that there's a camera activity to handle the intent
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
             // Create the File where the photo should go
@@ -131,10 +135,13 @@ public class ProfileActivity extends AppCompatActivity {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             setPic();
         }
+
     }
 
     private File createImageFile() throws IOException {
         // Create an image file name
+
+
         Long tsLong = System.currentTimeMillis()/1000;
         String timeStamp = tsLong.toString();
         String imageFileName = "JPEG_" + timeStamp + "_";
@@ -146,13 +153,17 @@ public class ProfileActivity extends AppCompatActivity {
         );
         // Save a file: path for use with ACTION_VIEW intents
         mCurrentPhotoPath = image.getAbsolutePath();
+        savePreferences();
+
         return image;
     }
 
     public void encodeBitmapAndSaveToFirebase(Bitmap bitmap) {
         if (mCurrentPhotoPath != null){
+            Log.d("PickEm", "mCurrentPhotoPath: " + mCurrentPhotoPath);
+            restorePreferences();
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
             String imageEncoded = Base64.encodeToString(baos.toByteArray(), Base64.DEFAULT);
             profileDatabaseReference
                     .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
@@ -169,18 +180,29 @@ public class ProfileActivity extends AppCompatActivity {
         // Get the dimensions of the bitmap
         BitmapFactory.Options bmOptions = new BitmapFactory.Options();
         bmOptions.inJustDecodeBounds = true;
+
         BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
         int photoW = bmOptions.outWidth;
         int photoH = bmOptions.outHeight;
 
         // Determine how much to scale down the image
-        int scaleFactor = Math.min(photoW/targetW, photoH/targetH);
+        int scaleFactor;
+        if (targetH == 0 | targetW == 0) {
+            scaleFactor = 1;
+        } else {
+            scaleFactor = Math.min(photoW/targetW, photoH/targetH);
+        }
 
         // Decode the image file into a Bitmap sized to fill the View
         bmOptions.inJustDecodeBounds = false;
         bmOptions.inSampleSize = scaleFactor;
 
+        restorePreferences();
+
         Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
+        if (bitmap == null) {
+            Log.d("PickEm", "Bitmap is null!");
+        }
         profileImageView.setImageBitmap(bitmap);
         encodeBitmapAndSaveToFirebase(bitmap);
     }
@@ -242,5 +264,19 @@ public class ProfileActivity extends AppCompatActivity {
                 .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
                 .child("userName")
                 .setValue(newName);
+    }
+
+    private void savePreferences(){
+        // We need an Editor object to make preference changes.
+        SharedPreferences.Editor editor = getPreferences(MODE_PRIVATE).edit();
+        editor.putString("mCurrentPhotoPath", mCurrentPhotoPath);
+
+        // Commit the edits!
+        editor.commit();
+    }
+
+    private void restorePreferences() {
+        SharedPreferences settings = getPreferences(MODE_PRIVATE);
+        mCurrentPhotoPath = settings.getString("mCurrentPhotoPath", "");
     }
 }
