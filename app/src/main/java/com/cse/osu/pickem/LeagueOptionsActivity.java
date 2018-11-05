@@ -250,7 +250,6 @@ public class LeagueOptionsActivity extends AppCompatActivity {
 
 
         // Create game RecyclerView Fragment
-        Log.d(TAG, mLeague.getLeagueID());
         FragmentManager fm = getSupportFragmentManager();
         Fragment fragment = fm.findFragmentById(R.id.fragment_container);
         if (fragment == null) {

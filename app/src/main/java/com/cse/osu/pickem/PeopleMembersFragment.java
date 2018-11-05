@@ -1,7 +1,6 @@
 package com.cse.osu.pickem;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -21,12 +20,12 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.List;
 
-public class PeopleFragment extends Fragment {
+public class PeopleMembersFragment extends Fragment {
     public static final String TAG = "LeagueListFragment";
     private RecyclerView mPeopleRecyclerView;
-    private DatabaseReference leaguesDatabaseReference;
-    private LeaguePeopleAdapter mAdapter;
+    private MemberAdapter mAdapter;
     private FirebaseAuth auth;
+    private String mLeagueID;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -36,6 +35,11 @@ public class PeopleFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_people_list, container, false);
+
+        // Get leagueID from launching activity
+        if (getArguments() != null){
+            mLeagueID = getArguments().getString("leagueID");
+        }
 
         // Get user auth data
         auth = FirebaseAuth.getInstance();
@@ -65,31 +69,23 @@ public class PeopleFragment extends Fragment {
 
     private void updateUI() {
         // Get user's owned leagues
-        UserLeagueFetcher userLeagueFetcher = UserLeagueFetcher.get(getActivity(), auth);
-        userLeagueFetcher.updateUsersLeagues();
-        List<League> leagues = userLeagueFetcher.getLeagues();
+        LeagueMembersFetcher leagueMembersFetcher = LeagueMembersFetcher.get(getActivity(), auth);
+        leagueMembersFetcher.updateLeagueMembers(mLeagueID);
 
-        mAdapter = new LeaguePeopleAdapter(leagues);
+        // Filter out only the owned leagues
+        List<LeagueMemberPair> members = leagueMembersFetcher.getMembers();
+
+        mAdapter = new MemberAdapter(members);
         mPeopleRecyclerView.removeAllViews();
         mAdapter.notifyDataSetChanged();
         mPeopleRecyclerView.setAdapter(mAdapter);
     }
 
+
     private void setupDatabaseListeners(){
         // Get database references
         DatabaseReference leaguesDatabaseReference = FirebaseDatabase.getInstance().getReference("leagues");
-        DatabaseReference leagueMemberDatabaseReference = FirebaseDatabase.getInstance().getReference("leagueMembers");
 
-        // League Members listener
-        leagueMemberDatabaseReference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                updateUI();
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-            }
-        });
         // Leagues listener
         leaguesDatabaseReference.addValueEventListener(new ValueEventListener() {
             @Override
@@ -103,53 +99,69 @@ public class PeopleFragment extends Fragment {
     }
 
     //// A "container" of recyclerView that holds a list item (a league)
-    private class LeaguePeopleHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    private class MemberHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         private TextView mLeagueNameTextView;
-        private League mLeague;
+        private LeagueMemberPair mMember;
 
-        public LeaguePeopleHolder(LayoutInflater inflater, ViewGroup parent) {
+        public MemberHolder(LayoutInflater inflater, ViewGroup parent) {
             super(inflater.inflate(R.layout.list_item_league, parent, false));
             itemView.setOnClickListener(this);
             mLeagueNameTextView = itemView.findViewById(R.id.league_name);
-
         }
-        public void bind(League league) {
-            mLeague = league;
-            mLeagueNameTextView.setText(mLeague.getLeagueName());
+        public void bind(LeagueMemberPair pair) {
+            mMember = pair;
+            setUsernameFromUID(pair.getUID());
         }
         @Override
         public void onClick(View view) {
-            // Launch league options activity, sending the League to manage via the intent
-            Intent intent = new Intent(getActivity(), LeagueOptionsActivity.class);
-            intent.putExtra("league", mLeague);
-            startActivity(intent);
+
+        }
+
+        private void setUsernameFromUID(final String uid){
+            // Get database reference
+            DatabaseReference profilesDatabaseReference = FirebaseDatabase.getInstance().getReference("profiles");
+            profilesDatabaseReference.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    for(DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                        Profile profile = snapshot.getValue(Profile.class);
+                        if (profile.getUserID().equals(uid)) {
+                            mLeagueNameTextView.setText(profile.getUserName());
+                            return;
+                        }
+                    }
+                }
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                }
+            });
         }
     }
 
     //// Links leagues to holders in the recyclerView
-    private class LeaguePeopleAdapter extends RecyclerView.Adapter<LeaguePeopleHolder> {
-        private List<League> mLeagues;
+    private class MemberAdapter extends RecyclerView.Adapter<MemberHolder> {
+        private List<LeagueMemberPair> mMembers;
 
-        public LeaguePeopleAdapter(List<League> leagues) {
-            mLeagues = leagues;
+        public MemberAdapter(List<LeagueMemberPair> members) {
+            mMembers = members;
         }
 
         @Override
-        public LeaguePeopleHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        public MemberHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
 
-            return new LeaguePeopleHolder(layoutInflater, parent);
+            return new MemberHolder(layoutInflater, parent);
         }
 
         @Override
-        public void onBindViewHolder(@NonNull LeaguePeopleHolder holder, int position) {
-            League league = mLeagues.get(position);
-            holder.bind(league);
+        public void onBindViewHolder(@NonNull MemberHolder holder, int position) {
+            LeagueMemberPair pair = mMembers.get(position);
+            holder.bind(pair);
         }
 
         @Override
         public int getItemCount() {
-            return mLeagues.size();
+            return mMembers.size();
         }
     }
 }
