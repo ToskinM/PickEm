@@ -19,22 +19,11 @@
             android:id="@+id/league_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="League Name"
             android:textAlignment="center"
             android:textAppearance="@style/TextAppearance.AppCompat.Caption"
             android:textSize="30sp"
             android:textStyle="bold"
-            tools:text="League Name" />
+            tools:text="Username" />
 
-        <TextView
-            android:id="@+id/league_name2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="League Name"
-            android:textAlignment="center"
-            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-            android:textSize="30sp"
-            android:textStyle="bold"
-            tools:text="League Name" />
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>

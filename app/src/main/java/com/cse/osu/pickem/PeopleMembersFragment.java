@@ -49,7 +49,7 @@ public class PeopleMembersFragment extends Fragment {
         mPeopleRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         // Update the list
-        //updateUI();
+        updateUI();
 
         // Setup Listeners
         setupDatabaseListeners();
@@ -84,10 +84,10 @@ public class PeopleMembersFragment extends Fragment {
 
     private void setupDatabaseListeners(){
         // Get database references
-        DatabaseReference leaguesDatabaseReference = FirebaseDatabase.getInstance().getReference("leagues");
+        DatabaseReference leagueMembersDatabaseReference = FirebaseDatabase.getInstance().getReference("leagueMembers");
 
         // Leagues listener
-        leaguesDatabaseReference.addValueEventListener(new ValueEventListener() {
+        leagueMembersDatabaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 updateUI();
@@ -104,7 +104,7 @@ public class PeopleMembersFragment extends Fragment {
         private LeagueMemberPair mMember;
 
         public MemberHolder(LayoutInflater inflater, ViewGroup parent) {
-            super(inflater.inflate(R.layout.list_item_league, parent, false));
+            super(inflater.inflate(R.layout.list_item_people, parent, false));
             itemView.setOnClickListener(this);
             mLeagueNameTextView = itemView.findViewById(R.id.league_name);
         }

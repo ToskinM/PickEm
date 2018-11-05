@@ -46,7 +46,7 @@ public class PeopleLeagueFragment extends Fragment {
         mPeopleRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         // Update the list
-        //updateUI();
+        updateUI();
 
         // Setup Listeners
         setupDatabaseListeners();

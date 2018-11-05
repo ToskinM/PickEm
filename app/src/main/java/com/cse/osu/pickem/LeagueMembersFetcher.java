@@ -53,7 +53,6 @@ public class LeagueMembersFetcher {
 
     public void updateLeagueMembers(String leagueID){
         this.mMembers.clear();
-        // Get leagues user is a member of
         for(LeagueMemberPair pair : this.mFetchedLeagueMembers) {
             if (pair.getLeagueID().equals(leagueID)) {
                 this.mMembers.add(pair);
