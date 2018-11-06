@@ -1,9 +1,19 @@
 package com.cse.osu.pickem;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Base64;
+import android.util.Log;
+
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.io.ByteArrayOutputStream;
 
@@ -112,5 +122,16 @@ public class Profile implements Parcelable {
         this.userID = in.readString();
         this.userName = in.readString();
         this.encodedProflePicture = in.readString();
+    }
+
+    public static String getEncodedProfilePicFromUserID(final String userID){
+        // Get database references
+        DatabaseReference profileDatabaseReference = FirebaseDatabase.getInstance().getReference("profiles");
+        Log.d("PROFILE", profileDatabaseReference.child(userID).getKey());
+        return profileDatabaseReference.child(userID).child("encodedProfilePic").getKey();
+    }
+    public static Bitmap getBitmapFromString(final String encodedBitmap){
+        byte[] decodedByteArray = android.util.Base64.decode(encodedBitmap, Base64.DEFAULT);
+        return BitmapFactory.decodeByteArray(decodedByteArray, 0, decodedByteArray.length);
     }
 }

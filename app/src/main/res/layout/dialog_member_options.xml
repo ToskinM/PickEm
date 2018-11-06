@@ -21,16 +21,18 @@
 
     <ImageView
         android:id="@+id/imageView_profilePic"
-        tools:srcCompat="@tools:sample/avatars"
         android:layout_width="match_parent"
-        android:layout_height="100dp"
+        android:layout_height="match_parent"
         android:contentDescription="Profile Picture"
-        android:scaleType="centerInside" />
+        android:scaleType="centerInside"
+        tools:srcCompat="@tools:sample/avatars" />
 
     <Button
         android:id="@+id/button_remove"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/button_changePicture" />
+        android:text="@string/button_removeLeague"
+        android:textAlignment="center"
+        android:textColor="@android:color/holo_red_dark" />
 
 </LinearLayout>

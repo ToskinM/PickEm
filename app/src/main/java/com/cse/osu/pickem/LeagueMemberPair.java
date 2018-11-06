@@ -59,4 +59,6 @@ public class LeagueMemberPair {
     }
 
     public void setPoints(int newPoints) { Points = newPoints; }
+
+
 }

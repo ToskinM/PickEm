@@ -2,6 +2,15 @@ package com.cse.osu.pickem;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.util.Log;
+
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class League implements Parcelable {
 
@@ -90,5 +99,31 @@ public class League implements Parcelable {
         this.leagueName = in.readString();
         this.leagueID = in.readString();
         this.leagueOwnerUID = in.readString();
+    }
+
+    // Removes user with the indicated Firebase UID from the league
+    public static void removeMemberFromLeague(final String leagueID, final String userID){
+        // Get database references
+        DatabaseReference leagueMemberDatabaseReference = FirebaseDatabase.getInstance().getReference("leagueMembers");
+        // League Members listener
+        leagueMemberDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for(DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    LeagueMemberPair tempPair = snapshot.getValue(LeagueMemberPair.class);
+                    if (tempPair.getUID().equals(userID) && tempPair.getLeagueID().equals(leagueID)) {
+                        snapshot.getRef().removeValue(new DatabaseReference.CompletionListener() {
+                            @Override
+                            public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
+
+                            }
+                        });
+                    }
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+            }
+        });
     }
 }

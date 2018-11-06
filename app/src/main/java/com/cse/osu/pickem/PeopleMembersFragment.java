@@ -1,15 +1,25 @@
 package com.cse.osu.pickem;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.media.Image;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -20,8 +30,9 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.List;
 
+
 public class PeopleMembersFragment extends Fragment {
-    public static final String TAG = "LeagueListFragment";
+    public static final String TAG = "PeopleMembersFragment";
     private RecyclerView mPeopleRecyclerView;
     private MemberAdapter mAdapter;
     private FirebaseAuth auth;
@@ -102,6 +113,9 @@ public class PeopleMembersFragment extends Fragment {
     private class MemberHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         private TextView mLeagueNameTextView;
         private LeagueMemberPair mMember;
+        private String memberProfilePic;
+        private String memberUsername;
+        private AlertDialog memberDialog;
 
         public MemberHolder(LayoutInflater inflater, ViewGroup parent) {
             super(inflater.inflate(R.layout.list_item_people, parent, false));
@@ -111,22 +125,26 @@ public class PeopleMembersFragment extends Fragment {
         public void bind(LeagueMemberPair pair) {
             mMember = pair;
             setUsernameFromUID(pair.getUID());
+
         }
         @Override
         public void onClick(View view) {
-
+            memberDialog = createMemberDialog();
+            memberDialog.show();
         }
 
         private void setUsernameFromUID(final String uid){
             // Get database reference
             DatabaseReference profilesDatabaseReference = FirebaseDatabase.getInstance().getReference("profiles");
-            profilesDatabaseReference.addValueEventListener(new ValueEventListener() {
+            profilesDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     for(DataSnapshot snapshot : dataSnapshot.getChildren()) {
                         Profile profile = snapshot.getValue(Profile.class);
                         if (profile.getUserID().equals(uid)) {
-                            mLeagueNameTextView.setText(profile.getUserName());
+                            memberUsername = profile.getUserName();
+                            mLeagueNameTextView.setText(memberUsername);
+                            memberProfilePic = profile.getEncodedProflePicture();
                             return;
                         }
                     }
@@ -135,6 +153,31 @@ public class PeopleMembersFragment extends Fragment {
                 public void onCancelled(@NonNull DatabaseError databaseError) {
                 }
             });
+        }
+
+        private AlertDialog createMemberDialog(){
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            LayoutInflater inflater = getActivity().getLayoutInflater();
+            View dialogView = inflater.inflate(R.layout.dialog_member_options, null);
+            builder.setView(dialogView);
+
+            TextView usernameTextView = dialogView.findViewById(R.id.textView_userName);
+            usernameTextView.setText(memberUsername);
+
+            ImageView profileImageView = dialogView.findViewById(R.id.imageView_profilePic);
+
+            if (memberProfilePic != null && !memberProfilePic.equals(""))
+                profileImageView.setImageBitmap(Profile.getBitmapFromString(memberProfilePic));
+
+            Button removeButton = dialogView.findViewById(R.id.button_remove);
+            removeButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    League.removeMemberFromLeague(mLeagueID, mMember.getUID());
+                }
+            });
+
+            return builder.create();
         }
     }
 

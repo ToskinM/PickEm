@@ -146,6 +146,7 @@ public class ProfileActivity extends AppCompatActivity {
         );
         // Save a file: path for use with ACTION_VIEW intents
         mCurrentPhotoPath = image.getAbsolutePath();
+        Log.d(TAG, "" + mCurrentPhotoPath);
         return image;
     }
 
@@ -162,6 +163,7 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void setPic() {
+        Log.d(TAG, "SetPic path: " + mCurrentPhotoPath);
         // Get the dimensions of the View
         int targetW = profileImageView.getWidth();
         int targetH = profileImageView.getHeight();

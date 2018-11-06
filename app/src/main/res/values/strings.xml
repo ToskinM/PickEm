@@ -48,4 +48,5 @@
     <string name="changePicture_avatar">Choose Avatar</string>
 
     <string name="yourOwnedLeagues">Leagues you own:</string>
+    <string name="button_removeLeague">Remove from League:</string>
 </resources>
