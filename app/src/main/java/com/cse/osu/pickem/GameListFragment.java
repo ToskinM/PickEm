@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -28,6 +29,8 @@ public class GameListFragment extends Fragment {
     private RecyclerView mGameRecyclerView;
     private GameAdapter mAdapter;
     private String mLeagueID;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,6 +45,15 @@ public class GameListFragment extends Fragment {
             mLeagueID = getArguments().getString("leagueID");
         }
         Log.d(TAG, mLeagueID);
+
+        mSwipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout);
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                // Refresh items
+                updateUI();
+            }
+        });
 
         // Setup recycler view
         mGameRecyclerView = view.findViewById(R.id.game_recycler_view);
@@ -72,6 +84,7 @@ public class GameListFragment extends Fragment {
         mGameRecyclerView.removeAllViews();
         mAdapter.notifyDataSetChanged();
         mGameRecyclerView.setAdapter(mAdapter);
+        mSwipeRefreshLayout.setRefreshing(false);
     }
 
     private void setupDatabaseListeners(){

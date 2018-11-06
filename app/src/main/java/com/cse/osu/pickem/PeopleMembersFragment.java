@@ -9,6 +9,7 @@ import android.media.Image;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -34,6 +35,7 @@ import java.util.List;
 public class PeopleMembersFragment extends Fragment {
     public static final String TAG = "PeopleMembersFragment";
     private RecyclerView mPeopleRecyclerView;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
     private MemberAdapter mAdapter;
     private FirebaseAuth auth;
     private String mLeagueID;
@@ -54,6 +56,15 @@ public class PeopleMembersFragment extends Fragment {
 
         // Get user auth data
         auth = FirebaseAuth.getInstance();
+
+        mSwipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout);
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                // Refresh items
+                updateUI();
+            }
+        });
 
         // Setup recycler view
         mPeopleRecyclerView = view.findViewById(R.id.leaguePeople_recycler_view);
@@ -90,6 +101,7 @@ public class PeopleMembersFragment extends Fragment {
         mPeopleRecyclerView.removeAllViews();
         mAdapter.notifyDataSetChanged();
         mPeopleRecyclerView.setAdapter(mAdapter);
+        mSwipeRefreshLayout.setRefreshing(false);
     }
 
 

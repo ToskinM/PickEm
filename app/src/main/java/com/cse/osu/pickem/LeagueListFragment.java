@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -36,6 +37,7 @@ public class LeagueListFragment extends Fragment {
     private DatabaseReference leaguesDatabaseReference;
     private LeagueAdapter mAdapter;
     private FirebaseAuth auth;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -78,6 +80,15 @@ public class LeagueListFragment extends Fragment {
         // Get user auth data
         auth = FirebaseAuth.getInstance();
 
+        mSwipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout);
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                // Refresh items
+                updateUI();
+            }
+        });
+
         // Setup recycler view
         mLeagueRecyclerView = view.findViewById(R.id.league_recycler_view);
         mLeagueRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -111,6 +122,7 @@ public class LeagueListFragment extends Fragment {
         mLeagueRecyclerView.removeAllViews();
         mAdapter.notifyDataSetChanged();
         mLeagueRecyclerView.setAdapter(mAdapter);
+        mSwipeRefreshLayout.setRefreshing(false);
     }
 
 

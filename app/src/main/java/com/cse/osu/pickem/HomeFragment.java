@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -33,6 +34,7 @@ import static com.google.android.gms.common.internal.Asserts.*;
 public class HomeFragment extends Fragment {
     public static final String TAG = "HomeListFragment";
     private RecyclerView mGameRecyclerView;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
     private GameAdapter mAdapter;
     UserLeagueFetcher userLeagueFetcher;
     private FirebaseAuth auth;
@@ -44,10 +46,19 @@ public class HomeFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_game_list, container, false);
+        View view = inflater.inflate(R.layout.fragment_home_list, container, false);
 
         // Get user auth data
         auth = FirebaseAuth.getInstance();
+
+        mSwipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout);
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                // Refresh items
+                updateUI();
+            }
+        });
 
         // Setup recycler view
         mGameRecyclerView = view.findViewById(R.id.game_recycler_view);
@@ -83,6 +94,7 @@ public class HomeFragment extends Fragment {
         mGameRecyclerView.removeAllViews();
         mAdapter.notifyDataSetChanged();
         mGameRecyclerView.setAdapter(mAdapter);
+        mSwipeRefreshLayout.setRefreshing(false);
     }
 
     private void setupDatabaseListeners(){

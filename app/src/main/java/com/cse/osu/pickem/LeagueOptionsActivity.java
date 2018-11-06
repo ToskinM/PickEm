@@ -45,6 +45,68 @@ public class LeagueOptionsActivity extends AppCompatActivity {
     private FirebaseAuth auth;
     private League mLeague;
 
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        // Get the league we're working with from intent
+        Intent creatorIntent = getIntent();
+        mLeague = creatorIntent.getParcelableExtra("league");
+
+        // Get Firebase Database references
+        leagueDatabaseReference = FirebaseDatabase.getInstance().getReference("leagues");
+        leagueMembersDatabaseReference = FirebaseDatabase.getInstance().getReference("leagueMembers");
+        gameDatabaseReference = FirebaseDatabase.getInstance().getReference("games");
+        auth = FirebaseAuth.getInstance();
+
+        setContentView(R.layout.activity_league_options);
+
+
+        // Create game RecyclerView Fragment
+        FragmentManager fm = getSupportFragmentManager();
+        Fragment fragment = fm.findFragmentById(R.id.fragment_container);
+        if (fragment == null) {
+            Bundle bundle = new Bundle();
+            bundle.putString("leagueID", mLeague.getLeagueID());
+            fragment = new GameListFragment();
+            fragment.setArguments(bundle);
+            fm.beginTransaction()
+                    .add(R.id.fragment_container, fragment)
+                    .commit();
+        }
+
+        // Setup Dialogs
+        setupAddGameButton();
+        setupRenameLeagueButton();
+        backButton = findViewById(R.id.buttonBackToLeagues);
+        backButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                Intent newIntent = new Intent(LeagueOptionsActivity.this, LeagueActivity.class);
+                startActivity(newIntent);
+            }
+        });
+        renameDialog = createRenameDialog();
+        deleteDialog = createDeleteLeagueDialog();
+
+        deleteLeagueButton = findViewById(R.id.buttonDeleteLeague);
+        deleteLeagueButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                deleteDialog.show();
+            }
+        });
+
+        // Display league's name at the top
+        TextView leagueNameTextView = findViewById(R.id.textViewLeagueName);
+        leagueNameTextView.setText(mLeague.getLeagueName());
+
+        // Setup toolbar
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+    }
+
     protected void setupAddGameButton() {
         addGameButton = findViewById(R.id.buttonAddGame);
         addGameButton.setOnClickListener(new View.OnClickListener() {
@@ -227,67 +289,7 @@ public class LeagueOptionsActivity extends AppCompatActivity {
         });
     }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
 
-        // Get the league we're working with from intent
-        Intent creatorIntent = getIntent();
-        mLeague = creatorIntent.getParcelableExtra("league");
-
-        // Get Firebase Database references
-        leagueDatabaseReference = FirebaseDatabase.getInstance().getReference("leagues");
-        leagueMembersDatabaseReference = FirebaseDatabase.getInstance().getReference("leagueMembers");
-        gameDatabaseReference = FirebaseDatabase.getInstance().getReference("games");
-        auth = FirebaseAuth.getInstance();
-
-        setContentView(R.layout.activity_league_options);
-
-
-        // Create game RecyclerView Fragment
-        FragmentManager fm = getSupportFragmentManager();
-        Fragment fragment = fm.findFragmentById(R.id.fragment_container);
-        if (fragment == null) {
-            Bundle bundle = new Bundle();
-            bundle.putString("leagueID", mLeague.getLeagueID());
-            fragment = new GameListFragment();
-            fragment.setArguments(bundle);
-            fm.beginTransaction()
-                    .add(R.id.fragment_container, fragment)
-                    .commit();
-        }
-
-        // Setup Dialogs
-        setupAddGameButton();
-        setupRenameLeagueButton();
-        backButton = findViewById(R.id.buttonBackToLeagues);
-        backButton.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                Intent newIntent = new Intent(LeagueOptionsActivity.this, LeagueActivity.class);
-                startActivity(newIntent);
-            }
-        });
-        renameDialog = createRenameDialog();
-        deleteDialog = createDeleteLeagueDialog();
-
-        deleteLeagueButton = findViewById(R.id.buttonDeleteLeague);
-        deleteLeagueButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                deleteDialog.show();
-            }
-        });
-
-        // Display league's name at the top
-        TextView leagueNameTextView = findViewById(R.id.textViewLeagueName);
-        leagueNameTextView.setText(mLeague.getLeagueName());
-
-        // Setup toolbar
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -300,11 +302,14 @@ public class LeagueOptionsActivity extends AppCompatActivity {
         int id = item.getItemId();
         switch (id){
             case R.id.action_addGame:
-                //wut
-            case R.id.action_rename:
+                addGameDialog().show();
+                return true;
+            case  R.id.action_rename:
                 renameDialog.show();
+                return true;
             case R.id.action_delete:
                 deleteDialog.show();
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
