@@ -8,8 +8,8 @@
         android:title="@string/changePicture_take"
         app:showAsAction="never" />
     <item
-        android:id="@+id/action_chooseAvatar"
+        android:id="@+id/action_removePicture"
         android:orderInCategory="100"
-        android:title="@string/changePicture_avatar"
+        android:title="@string/removePicture"
         app:showAsAction="never" />
 </menu>

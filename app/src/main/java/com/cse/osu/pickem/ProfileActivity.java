@@ -56,6 +56,7 @@ public class ProfileActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
+        setTitle("Your Profile");
 
         // Init database refs
         auth = FirebaseAuth.getInstance();
@@ -88,9 +89,12 @@ public class ProfileActivity extends AppCompatActivity {
                         switch (id){
                             case R.id.action_takePhoto:
                                 dispatchTakePictureIntent();
-                            case R.id.action_chooseAvatar:
+                                return true;
+                            case R.id.action_removePicture:
+                                removePicture();
+                                return true;
                         }
-                        return true;
+                        return false;
                     }
                 });
                 popup.show();
@@ -104,6 +108,13 @@ public class ProfileActivity extends AppCompatActivity {
                 renameDialog.show();
             }
         });
+    }
+
+    private void removePicture(){
+        profileDatabaseReference
+                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .child("encodedProflePicture")
+                .setValue("");
     }
 
     private void dispatchTakePictureIntent() {
@@ -134,6 +145,7 @@ public class ProfileActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             setPic();
+            updateProfileInfo();
         }
 
     }
@@ -187,7 +199,7 @@ public class ProfileActivity extends AppCompatActivity {
 
         // Determine how much to scale down the image
         int scaleFactor;
-        if (targetH == 0 | targetW == 0) {
+        if (targetH == 0 || targetW == 0) {
             scaleFactor = 1;
         } else {
             scaleFactor = Math.min(photoW/targetW, photoH/targetH);

@@ -70,6 +70,8 @@ public class HomeFragment extends Fragment {
 
         userLeagueFetcher = UserLeagueFetcher.get(getActivity(), auth);
 
+        updateUI();
+
         return view;
     }
 

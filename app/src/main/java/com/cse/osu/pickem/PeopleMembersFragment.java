@@ -1,26 +1,19 @@
 package com.cse.osu.pickem;
 
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.media.Image;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -91,11 +84,10 @@ public class PeopleMembersFragment extends Fragment {
 
     private void updateUI() {
         // Get user's owned leagues
-        LeagueMembersFetcher leagueMembersFetcher = LeagueMembersFetcher.get(getActivity(), auth);
-        leagueMembersFetcher.updateLeagueMembers(mLeagueID);
+        LeagueMembersFetcher leagueMembersFetcher = LeagueMembersFetcher.get(getActivity());
 
         // Filter out only the owned leagues
-        List<LeagueMemberPair> members = leagueMembersFetcher.getMembers();
+        List<LeagueMemberPair> members = leagueMembersFetcher.getMembersOfLeague(mLeagueID);
 
         mAdapter = new MemberAdapter(members);
         mPeopleRecyclerView.removeAllViews();
@@ -123,7 +115,8 @@ public class PeopleMembersFragment extends Fragment {
 
     //// A "container" of recyclerView that holds a list item (a league)
     private class MemberHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
-        private TextView mLeagueNameTextView;
+        private TextView mUsernameTextView;
+        private TextView mScoreTextView;
         private LeagueMemberPair mMember;
         private String memberProfilePic;
         private String memberUsername;
@@ -132,12 +125,13 @@ public class PeopleMembersFragment extends Fragment {
         public MemberHolder(LayoutInflater inflater, ViewGroup parent) {
             super(inflater.inflate(R.layout.list_item_people, parent, false));
             itemView.setOnClickListener(this);
-            mLeagueNameTextView = itemView.findViewById(R.id.league_name);
+            mUsernameTextView = itemView.findViewById(R.id.user_name);
+            mScoreTextView = itemView.findViewById(R.id.user_score);
         }
         public void bind(LeagueMemberPair pair) {
             mMember = pair;
             setUsernameFromUID(pair.getUID());
-
+            mScoreTextView.setText(Integer.toString(pair.getPoints()));
         }
         @Override
         public void onClick(View view) {
@@ -155,7 +149,7 @@ public class PeopleMembersFragment extends Fragment {
                         Profile profile = snapshot.getValue(Profile.class);
                         if (profile.getUserID().equals(uid)) {
                             memberUsername = profile.getUserName();
-                            mLeagueNameTextView.setText(memberUsername);
+                            mUsernameTextView.setText(memberUsername);
                             memberProfilePic = profile.getEncodedProflePicture();
                             return;
                         }

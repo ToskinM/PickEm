@@ -9,20 +9,32 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="@drawable/common_google_signin_btn_icon_light_normal_background"
-        android:orientation="vertical"
+        android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <TextView
-            android:id="@+id/league_name"
+            android:id="@+id/user_name"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
             android:textAlignment="center"
             android:textAppearance="@style/TextAppearance.AppCompat.Caption"
             android:textSize="30sp"
             android:textStyle="bold"
             tools:text="Username" />
+
+        <TextView
+            android:id="@+id/user_score"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="3"
+            android:textAlignment="center"
+            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+            android:textSize="30sp"
+            android:textStyle="bold"
+            tools:text="Score" />
 
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>
