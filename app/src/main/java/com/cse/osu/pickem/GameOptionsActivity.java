@@ -57,11 +57,13 @@ public class GameOptionsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game_options);
+
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         Intent creatorIntent = getIntent();
         mGame = creatorIntent.getParcelableExtra("game");
+        setTitle(mGame.getFirstTeamName() + " vs. " + mGame.getSecondTeamName());
 
         addPickButton = findViewById(R.id.buttonMakePick);
         endGameButton = findViewById(R.id.buttonEndGame);
@@ -99,9 +101,6 @@ public class GameOptionsActivity extends AppCompatActivity {
 
         //Load picks into local data structure for less garbage code below <3
         updatePickMap(pickToPickID);
-
-
-
     }
 
     protected void updatePickMap(final Map<Pick, String> pickToPickIDIn) {

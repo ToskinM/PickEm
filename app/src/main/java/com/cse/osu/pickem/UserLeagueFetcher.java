@@ -42,6 +42,7 @@ public class UserLeagueFetcher {
 
     }
 
+    // returns leagues user is a member of
     public List<League> getLeagues() {
         return this.mLeagues;
     }

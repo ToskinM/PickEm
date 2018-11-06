@@ -39,6 +39,9 @@ public class UserGameFetcher {
         }
         return leagueGames;
     }
+    public List<Game> getAllGames() {
+        return mFetchedGames;
+    }
 
     private void setupDatabaseListeners(){
         // Get database references
