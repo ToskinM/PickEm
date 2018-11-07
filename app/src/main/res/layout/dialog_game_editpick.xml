@@ -11,16 +11,18 @@
         android:textSize="20sp"/>
 
     <EditText
+        android:id="@+id/teamA_edit_prediction_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Team A final score prediction"
-        android:id="@+id/teamA_edit_prediction_text"/>
+        android:inputType="number" />
 
     <EditText
+        android:id="@+id/teamB_edit_prediction_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Team B final score prediction"
-        android:id="@+id/teamB_edit_prediction_text"/>
+        android:inputType="number" />
 
 
 </LinearLayout>

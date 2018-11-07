@@ -272,6 +272,9 @@ public class ProfileActivity extends AppCompatActivity {
         return builder.create();
     }
     private void changeUsername(String newName){
+        if (newName.trim().equals("")) {
+            newName = "username";
+        }
         profileDatabaseReference
                 .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
                 .child("userName")

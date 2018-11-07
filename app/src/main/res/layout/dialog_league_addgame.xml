@@ -21,24 +21,26 @@
             android:inputType="textCapWords|textAutoCorrect|textAutoComplete" />
 
         <EditText
+            android:id="@+id/teamB_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/teamB_text"
             android:layout_marginLeft="4dp"
             android:layout_marginTop="4dp"
             android:layout_marginRight="4dp"
             android:layout_marginBottom="4dp"
-            android:hint="Second Team Name"/>
+            android:hint="Second Team Name"
+            android:inputType="textCapWords|textAutoCorrect|textAutoComplete" />
 
         <EditText
+            android:id="@+id/time_remaining_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/time_remaining_text"
             android:layout_marginLeft="4dp"
             android:layout_marginTop="4dp"
             android:layout_marginRight="4dp"
             android:layout_marginBottom="4dp"
-            android:hint="Days for picking to stay open"/>
+            android:hint="Days for picking to stay open"
+            android:inputType="number" />
 
     </LinearLayout>
 
