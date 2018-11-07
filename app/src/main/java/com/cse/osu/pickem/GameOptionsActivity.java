@@ -52,6 +52,7 @@ public class GameOptionsActivity extends AppCompatActivity {
     private AlertDialog endGameDialog;
     private AlertDialog editPickDialog;
     private Map<Pick, String> pickToPickID;
+    private boolean gameTimeExpired;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,13 +81,23 @@ public class GameOptionsActivity extends AppCompatActivity {
         addPickButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                addPickDialog.show();
+                if (!mGame.isPastLockTime()) {
+                    addPickDialog.show();
+                } else {
+                    Toast.makeText(GameOptionsActivity.this, "Picking for this game is closed!", Toast.LENGTH_SHORT).show();
+                }
+
             }
         });
         editPickButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                editPickDialog.show();
+                if (!mGame.isPastLockTime()) {
+                    editPickDialog.show();
+                } else {
+                    Toast.makeText(GameOptionsActivity.this, "Picking for this game is closed!", Toast.LENGTH_SHORT).show();
+                }
+
             }
         });
         endGameButton.setOnClickListener(new View.OnClickListener() {

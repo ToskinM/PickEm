@@ -28,6 +28,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.Date;
+
 public class LeagueOptionsActivity extends AppCompatActivity {
 
     public static final String TAG = "LeagueOptionsActivity";
@@ -128,10 +130,16 @@ public class LeagueOptionsActivity extends AppCompatActivity {
                 Dialog d = (Dialog) dialog;
                 String teamAText = ((EditText)d.findViewById(R.id.teamA_text)).getText().toString().trim();
                 String teamBText = ((EditText)d.findViewById(R.id.teamB_text)).getText().toString().trim();
+                String daysText = ((EditText)d.findViewById(R.id.time_remaining_text)).getText().toString().trim();
+                int days = Integer.parseInt(daysText);
                 String leagueID = mLeague.getLeagueID();
                 Log.d("PickEm", "YEET:" + leagueID);
 
                 Game newGame = new Game(teamAText, teamBText, leagueID);
+                Date now = new Date();
+                Date lockTime = new Date();
+                lockTime.setTime(now.getTime() + 86400000L * (long)days);
+                newGame.setLockTime(lockTime);
                 addGame(newGame);
             }
         })
