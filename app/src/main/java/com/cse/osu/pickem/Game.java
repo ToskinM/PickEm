@@ -22,23 +22,16 @@ public class Game implements Parcelable {
     private String firstTeamName;
     private String secondTeamName;
     private String leagueID;
-    private boolean isLocked;
     private Date mLockTime;
     private String gameID;
 
     private DatabaseReference picksReference;
     private DatabaseReference leagueMemberReference;
 
-    private List<LeagueMemberPair> loadedMembers;
-    private List<Pick> loadedPicks;
-
     public Game(String firstTeamName, String secondTeamName, String leagueID) {
         this.firstTeamName = firstTeamName;
         this.secondTeamName = secondTeamName;
         this.leagueID = leagueID;
-
-        loadedMembers = new ArrayList<>();
-        loadedPicks = new ArrayList<>();
     }
 
 
@@ -111,15 +104,16 @@ public class Game implements Parcelable {
         mLockTime = lockTime;
     }
 
-    public boolean isLocked() {
-        return isLocked;
+    public Date getLockTime() {
+        return mLockTime;
     }
 
-    public void checkTime() {
-        if (mLockTime.before(new Date())) {
-            isLocked = true;
-        }
+    public boolean isPastLockTime() {
+        Date currentDate = new Date();
+
+        return currentDate.after(mLockTime);
     }
+
 
     public Game() {
 
@@ -141,14 +135,6 @@ public class Game implements Parcelable {
         this.secondTeamName = secondTeamName;
     }
 
-    //public boolean isLocked() {
-    //    return isLocked;
-    //}
-
-    //public void setLocked(boolean locked) {
-    //    isLocked = locked;
-    //}
-
     public String getLeagueID() {
         return this.leagueID;
     }
@@ -169,7 +155,7 @@ public class Game implements Parcelable {
         dest.writeString(secondTeamName);
         dest.writeString(leagueID);
         dest.writeString(gameID);
-        //dest.writeBooleanArray(new boolean[] {isLocked});
+        dest.writeLong(mLockTime.getTime());
     }
 
     private Game(Parcel in) {
@@ -177,9 +163,8 @@ public class Game implements Parcelable {
         this.secondTeamName = in.readString();
         this.leagueID = in.readString();
         this.gameID = in.readString();
-        //boolean[] tempArray = new boolean[1];
-        //in.readBooleanArray(tempArray);
-        //this.isLocked = tempArray[0];
+        Date date = new Date();
+        date.setTime(in.readLong());
     }
 
     public static final Parcelable.Creator<Game> CREATOR = new Parcelable.Creator<Game>() {
