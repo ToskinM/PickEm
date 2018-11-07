@@ -13,9 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -78,7 +76,7 @@ public class GameListFragment extends Fragment {
     private void updateUI() {
         // Get user's owned leagues
         UserGameFetcher userGameFetcher = UserGameFetcher.get(getActivity());
-        List<Game> games = userGameFetcher.getGames(mLeagueID);
+        List<Game> games = userGameFetcher.getGamesOfLeague(mLeagueID);
 
         mAdapter = new GameAdapter(games);
         mGameRecyclerView.removeAllViews();
