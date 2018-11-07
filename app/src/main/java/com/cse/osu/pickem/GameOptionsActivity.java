@@ -252,10 +252,10 @@ public class GameOptionsActivity extends AppCompatActivity {
 
     protected AlertDialog endGameDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("End Gmae?");
+        builder.setTitle("End Game?");
         LayoutInflater inflater = GameOptionsActivity.this.getLayoutInflater();
         builder.setView(inflater.inflate(R.layout.dialog_game_endgame, null))
-                .setPositiveButton("Create", new DialogInterface.OnClickListener() {
+                .setPositiveButton("Finalize", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         Dialog d = (Dialog) dialog;
@@ -264,6 +264,7 @@ public class GameOptionsActivity extends AppCompatActivity {
                         int aScore = Integer.parseInt(actualAScore.getText().toString().trim());
                         int bScore = Integer.parseInt(actualBScore.getText().toString().trim());
                         mGame.endGame(mGame.getGameID(), aScore, bScore);
+                        finish();
                     }
                 })
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {

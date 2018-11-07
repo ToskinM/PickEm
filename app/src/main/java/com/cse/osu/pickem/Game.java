@@ -79,6 +79,7 @@ public class Game implements Parcelable {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     LeagueMemberPair pair = snapshot.getValue(LeagueMemberPair.class);
+                    // THis is looking at every pick made across all games.  So anyone thats ever picked wil get points for this game
                     if (pair.getUID().equals(pick.getUserID())) {
                         String key = snapshot.getKey();
                         int newPoints = pair.getPoints() + finalNewPoints;
