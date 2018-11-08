@@ -20,6 +20,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -140,7 +141,12 @@ public class LeagueOptionsActivity extends AppCompatActivity {
                 Date lockTime = new Date();
                 lockTime.setTime(now.getTime() + 86400000L * (long)days);
                 newGame.setLockTime(lockTime);
-                addGame(newGame);
+                if (auth.getUid().equals(mLeague.getLeagueOwnerUID())) {
+                    addGame(newGame);
+                } else {
+                    Toast.makeText(LeagueOptionsActivity.this, "Only the owner can make a game!", Toast.LENGTH_SHORT).show();
+                }
+
             }
         })
         .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {

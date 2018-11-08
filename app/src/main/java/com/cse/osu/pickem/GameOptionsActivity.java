@@ -108,8 +108,6 @@ public class GameOptionsActivity extends AppCompatActivity {
         });
         pickToPickID = new HashMap<>();
 
-        final Game mGame2 = mGame;
-
         //Load picks into local data structure for less garbage code below <3
         updatePickMap(pickToPickID);
     }
@@ -183,8 +181,8 @@ public class GameOptionsActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         Dialog d = (Dialog) dialog;
 
-                        int teamAScore = Integer.parseInt(((EditText)d.findViewById(R.id.teamA_edit_prediction_text)).getText().toString().trim());
-                        int teamBScore = Integer.parseInt(((EditText)d.findViewById(R.id.teamB_edit_prediction_text)).getText().toString().trim());
+                        int teamAScore = Integer.parseInt(((EditText) d.findViewById(R.id.teamA_edit_prediction_text)).getText().toString().trim());
+                        int teamBScore = Integer.parseInt(((EditText) d.findViewById(R.id.teamB_edit_prediction_text)).getText().toString().trim());
                         Pick myPick = new Pick(auth.getUid(), mGame.getGameID(), teamAScore, teamBScore);
                         if (editPick(myPick)) {
                             Toast.makeText(GameOptionsActivity.this, "Success!", Toast.LENGTH_SHORT).show();
@@ -200,7 +198,6 @@ public class GameOptionsActivity extends AppCompatActivity {
         });
 
 
-
         return builder.create();
     }
 
@@ -214,8 +211,8 @@ public class GameOptionsActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         Dialog d = (Dialog) dialog;
 
-                        int teamAScore = Integer.parseInt(((EditText)d.findViewById(R.id.teamA_prediction_text)).getText().toString().trim());
-                        int teamBScore = Integer.parseInt(((EditText)d.findViewById(R.id.teamB_prediction_text)).getText().toString().trim());
+                        int teamAScore = Integer.parseInt(((EditText) d.findViewById(R.id.teamA_prediction_text)).getText().toString().trim());
+                        int teamBScore = Integer.parseInt(((EditText) d.findViewById(R.id.teamB_prediction_text)).getText().toString().trim());
                         Pick myPick = new Pick(auth.getUid(), mGame.getGameID(), teamAScore, teamBScore);
                         if (addPick(myPick)) {
                             Toast.makeText(GameOptionsActivity.this, "Success!", Toast.LENGTH_SHORT).show();

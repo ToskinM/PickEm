@@ -4,10 +4,14 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
+import android.util.Log;
+import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Exclude;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
@@ -22,11 +26,13 @@ public class Game implements Parcelable {
     private String firstTeamName;
     private String secondTeamName;
     private String leagueID;
+    @Exclude
     private Date mLockTime;
     private String gameID;
 
     private DatabaseReference picksReference;
     private DatabaseReference leagueMemberReference;
+    private FirebaseAuth auth = FirebaseAuth.getInstance();
 
     public Game(String firstTeamName, String secondTeamName, String leagueID) {
         this.firstTeamName = firstTeamName;
@@ -39,15 +45,31 @@ public class Game implements Parcelable {
         picksReference = FirebaseDatabase.getInstance().getReference("picks");
         leagueMemberReference = FirebaseDatabase.getInstance().getReference("leagueMembers");
 
-        picksReference.addListenerForSingleValueEvent(new ValueEventListener() {
+        DatabaseReference leagueReference = FirebaseDatabase.getInstance().getReference("leagues");
+        leagueReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    Pick tempPick = snapshot.getValue(Pick.class);
-                    calculatePoints(tempPick, teamAFinalScore, teamBFinalScore);
-                    DatabaseReference gamesReference = FirebaseDatabase.getInstance().getReference("games");
-                    gamesReference = gamesReference.child(gameID);
-                    gamesReference.getParent().removeValue();
+                    League testLeague = snapshot.getValue(League.class);
+                    if (testLeague.getLeagueOwnerUID().equals(auth.getUid()) && leagueID.equals(testLeague.getLeagueID())) {
+                        picksReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                                    Pick tempPick = snapshot.getValue(Pick.class);
+                                    calculatePoints(tempPick, teamAFinalScore, teamBFinalScore);
+                                    DatabaseReference gamesReference = FirebaseDatabase.getInstance().getReference("games");
+                                    gamesReference = gamesReference.child(gameID);
+                                    gamesReference.removeValue();
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
+                    }
                 }
             }
 
@@ -56,6 +78,11 @@ public class Game implements Parcelable {
 
             }
         });
+
+
+
+
+
 
     }
 
@@ -73,13 +100,14 @@ public class Game implements Parcelable {
         }
 
         final int finalNewPoints = pointsWon;
+        final String leagueIDFinal = leagueID;
 
         leagueMemberReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     LeagueMemberPair pair = snapshot.getValue(LeagueMemberPair.class);
-                    if (pair.getUID().equals(pick.getUserID())) {
+                    if (pair.getUID().equals(pick.getUserID()) && pair.getLeagueID().equals(leagueIDFinal)) {
                         String key = snapshot.getKey();
                         int newPoints = pair.getPoints() + finalNewPoints;
                         Map<String, Object> newMap = new HashMap<>();
@@ -99,7 +127,6 @@ public class Game implements Parcelable {
 
     }
 
-
     public void setLockTime(Date lockTime) {
         mLockTime = lockTime;
     }
@@ -110,6 +137,9 @@ public class Game implements Parcelable {
 
     public boolean isPastLockTime() {
         Date currentDate = new Date();
+        if (mLockTime == null) {
+            Log.d("PickEm", "mLockTime is null my dude!");
+        }
 
         return currentDate.after(mLockTime);
     }
@@ -165,6 +195,7 @@ public class Game implements Parcelable {
         this.gameID = in.readString();
         Date date = new Date();
         date.setTime(in.readLong());
+        this.mLockTime = date;
     }
 
     public static final Parcelable.Creator<Game> CREATOR = new Parcelable.Creator<Game>() {

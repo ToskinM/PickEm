@@ -30,6 +30,7 @@ public class GameListFragment extends Fragment {
     private GameAdapter mAdapter;
     private String mLeagueID;
     private SwipeRefreshLayout mSwipeRefreshLayout;
+    private League mLeague;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -43,6 +44,7 @@ public class GameListFragment extends Fragment {
         // Get leagueID from launching activity
         if (getArguments() != null){
             mLeagueID = getArguments().getString("leagueID");
+            mLeague = (League)getArguments().get("leagueOwner");
         }
         Log.d(TAG, mLeagueID);
 
