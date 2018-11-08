@@ -5,18 +5,16 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.google.android.gms.common.internal.Asserts;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -25,11 +23,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import static com.google.android.gms.common.internal.Asserts.*;
 
 public class HomeFragment extends Fragment {
     public static final String TAG = "HomeListFragment";
@@ -37,6 +31,8 @@ public class HomeFragment extends Fragment {
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private GameAdapter mAdapter;
     UserLeagueFetcher userLeagueFetcher;
+    UserGameFetcher userGameFetcher;
+    List<Pair<Game, League>> gameLeaguePairs = new ArrayList<>();
     private FirebaseAuth auth;
 
     @Override
@@ -68,7 +64,10 @@ public class HomeFragment extends Fragment {
         // Setup Listeners
         setupDatabaseListeners();
 
-        userLeagueFetcher = UserLeagueFetcher.get(getActivity(), auth);
+        userLeagueFetcher = UserLeagueFetcher.get(getActivity());
+        userGameFetcher = UserGameFetcher.get(getActivity());
+
+        updateUI();
 
         return view;
     }
@@ -84,13 +83,19 @@ public class HomeFragment extends Fragment {
     }
 
     private void updateUI() {
-        // Get user's owned leagues
-        UserGameFetcher userGameFetcher = UserGameFetcher.get(getActivity());
-        List<Game> games = userGameFetcher.getAllGames();
+        gameLeaguePairs.clear();
+        List<League> leagues = userLeagueFetcher.getUserLeagues(auth.getUid());
+        Log.d(TAG,"" + leagues.size());
+        for (League league : leagues){
+            List<Game> games = userGameFetcher.getGamesOfLeague(league.getLeagueID());
+            Log.d(TAG,"" + games.size());
+            for (Game game : games){
+                Pair<Game, League> pair = new Pair<>(game, league);
+                gameLeaguePairs.add(pair);
+            }
+        }
 
-        //List<League> leagues = userLeagueFetcher.getLeagues();
-
-        mAdapter = new GameAdapter(games);
+        mAdapter = new GameAdapter(gameLeaguePairs);
         mGameRecyclerView.removeAllViews();
         mAdapter.notifyDataSetChanged();
         mGameRecyclerView.setAdapter(mAdapter);
@@ -125,9 +130,9 @@ public class HomeFragment extends Fragment {
             mLeagueTextView = itemView.findViewById(R.id.league_name);
 
         }
-        public void bind(Game game, League league) {
-            mGame = game;
-            mLeague = league;
+        public void bind(Pair<Game, League> pair) {
+            mGame = pair.first;
+            mLeague = pair.second;
             if (mGame != null)
                 mGameTextView.setText(mGame.getFirstTeamName() + " vs. " + mGame.getSecondTeamName());
             if (mLeague != null)
@@ -145,10 +150,10 @@ public class HomeFragment extends Fragment {
 
     //// Links games to holders in the recyclerView
     private class GameAdapter extends RecyclerView.Adapter<GameHolder> {
-        private List<Game> mGames;
+        private List<Pair<Game, League>> mPairs;
 
-        public GameAdapter(List<Game> games) {
-            mGames = games;
+        public GameAdapter(List<Pair<Game, League>> pairs) {
+            this.mPairs = pairs;
         }
 
         @Override
@@ -160,14 +165,13 @@ public class HomeFragment extends Fragment {
 
         @Override
         public void onBindViewHolder(@NonNull GameHolder holder, int position) {
-            Game game = mGames.get(position);
-            League league = userLeagueFetcher.getLeague(game.getLeagueID());
-            holder.bind(game, league);
+            Pair<Game, League> pair = gameLeaguePairs.get(position);
+            holder.bind(pair);
         }
 
         @Override
         public int getItemCount() {
-            return mGames.size();
+            return mPairs.size();
         }
     }
 }

@@ -38,7 +38,6 @@ public class LeagueOptionsActivity extends AppCompatActivity {
     private Button addGameButton;
     private Button renameLeagueButton;
     private Button deleteLeagueButton;
-    private Button backButton;
     private AlertDialog renameDialog;
     private AlertDialog deleteDialog;
 
@@ -81,15 +80,6 @@ public class LeagueOptionsActivity extends AppCompatActivity {
         // Setup Dialogs
         setupAddGameButton();
         setupRenameLeagueButton();
-        backButton = findViewById(R.id.buttonBackToLeagues);
-        backButton.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                Intent newIntent = new Intent(LeagueOptionsActivity.this, LeagueActivity.class);
-                startActivity(newIntent);
-            }
-        });
         renameDialog = createRenameDialog();
         deleteDialog = createDeleteLeagueDialog();
 

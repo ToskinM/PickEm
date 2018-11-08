@@ -1,15 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/fragment_container_list"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".PeopleMembersActivity">
-
-    <FrameLayout
-        android:id="@+id/fragment_container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-    </FrameLayout>
-</android.support.constraint.ConstraintLayout>
+    app:layout_constraintTop_toTopOf="parent"
+    app:layout_constraintVertical_chainStyle="spread_inside"
+    tools:layout_editor_absoluteX="8dp"></FrameLayout>

@@ -12,38 +12,36 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class LeagueMembersFetcher {
     public static final String TAG = "LeagueMembersFetcher";
     private static LeagueMembersFetcher sLeagueMembersFetcher;
-    private Set<LeagueMemberPair> mFetchedLeagueMembers;
 
     // List of leagues to be sent to recycler view
-    private List<LeagueMemberPair> mMembers;
+    private List<LeagueMemberPair> mAllMembers;
 
-    public static LeagueMembersFetcher get(Context context, FirebaseAuth auth) {
+    public static LeagueMembersFetcher get(Context context) {
         if (sLeagueMembersFetcher == null) {
-            sLeagueMembersFetcher = new LeagueMembersFetcher(context, auth);
+            sLeagueMembersFetcher = new LeagueMembersFetcher(context);
         }
         return sLeagueMembersFetcher;
     }
 
-    private LeagueMembersFetcher(Context context, final FirebaseAuth auth) {
-        this.mMembers = new ArrayList<>();
-        this.mFetchedLeagueMembers = new HashSet<>();
+    private LeagueMembersFetcher(Context context) {
+        this.mAllMembers = new ArrayList<>();
         setupDatabaseListeners();
 
     }
 
-    public List<LeagueMemberPair> getMembers() {
-        return this.mMembers;
+    // Returns all members of all leagues
+    public List<LeagueMemberPair> getAllMembers() {
+        return this.mAllMembers;
     }
 
+    // Returns member of a specified league
     public LeagueMemberPair getMember(String leagueID) {
-        for (LeagueMemberPair pair : mMembers) {
+        for (LeagueMemberPair pair : mAllMembers) {
             if (pair.getLeagueID().equals(leagueID)) {
                 return pair;
             }
@@ -51,13 +49,15 @@ public class LeagueMembersFetcher {
         return null;
     }
 
-    public void updateLeagueMembers(String leagueID){
-        this.mMembers.clear();
-        for(LeagueMemberPair pair : this.mFetchedLeagueMembers) {
+    // Returns members of a specified league
+    public List<LeagueMemberPair> getMembersOfLeague(String leagueID) {
+        List<LeagueMemberPair> membersOfLeague = new ArrayList<>();
+        for(LeagueMemberPair pair : mAllMembers) {
             if (pair.getLeagueID().equals(leagueID)) {
-                this.mMembers.add(pair);
+                membersOfLeague.add(pair);
             }
         }
+        return membersOfLeague;
     }
 
     private void setupDatabaseListeners(){
@@ -68,12 +68,12 @@ public class LeagueMembersFetcher {
         leagueMemberDatabaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                mFetchedLeagueMembers.clear();
+                mAllMembers.clear();
                 Log.d(TAG, dataSnapshot.getChildrenCount() + "");
                 for(DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     LeagueMemberPair tempPair = snapshot.getValue(LeagueMemberPair.class);
-                    if (!mFetchedLeagueMembers.contains(tempPair)) {
-                        mFetchedLeagueMembers.add(tempPair);
+                    if (!mAllMembers.contains(tempPair)) {
+                        mAllMembers.add(tempPair);
                     }
                 }
             }

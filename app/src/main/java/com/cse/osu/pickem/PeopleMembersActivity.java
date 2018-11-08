@@ -27,21 +27,24 @@ public class PeopleMembersActivity extends AppCompatActivity {
         Intent creatorIntent = getIntent();
         mLeague = creatorIntent.getParcelableExtra("league");
 
+        // Set activity Title
+        setTitle("Members of " + mLeague.getLeagueName());
+
         // Get Firebase Database references
         leagueDatabaseReference = FirebaseDatabase.getInstance().getReference("leagues");
         leagueMembersDatabaseReference = FirebaseDatabase.getInstance().getReference("leagueMembers");
         auth = FirebaseAuth.getInstance();
 
-        // Create league's members RecyclerView Fragment
         FragmentManager fm = getSupportFragmentManager();
-        Fragment fragment = fm.findFragmentById(R.id.fragment_container);
-        if (fragment == null) {
+        // Create league's members RecyclerView Fragment
+        Fragment listFragment = fm.findFragmentById(R.id.fragment_container_list);
+        if (listFragment == null) {
             Bundle bundle = new Bundle();
             bundle.putString("leagueID", mLeague.getLeagueID());
-            fragment = new PeopleMembersFragment();
-            fragment.setArguments(bundle);
+            listFragment = new PeopleMembersFragment();
+            listFragment.setArguments(bundle);
             fm.beginTransaction()
-                    .add(R.id.fragment_container, fragment)
+                    .add(R.id.fragment_container_list, listFragment)
                     .commit();
         }
     }

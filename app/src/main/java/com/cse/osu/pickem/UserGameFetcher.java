@@ -30,7 +30,7 @@ public class UserGameFetcher {
         setupDatabaseListeners();
     }
 
-    public List<Game> getGames(String leagueID) {
+    public List<Game> getGamesOfLeague(String leagueID) {
         List<Game> leagueGames = new ArrayList<>();
         for(Game game : mFetchedGames) {
             if (game.getLeagueID().equals(leagueID)) {

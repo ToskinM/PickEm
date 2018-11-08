@@ -77,11 +77,10 @@ public class PeopleLeagueFragment extends Fragment {
 
     private void updateUI() {
         // Get user's owned leagues
-        UserLeagueFetcher userLeagueFetcher = UserLeagueFetcher.get(getActivity(), auth);
-        userLeagueFetcher.updateUsersLeagues();
+        UserLeagueFetcher userLeagueFetcher = UserLeagueFetcher.get(getActivity());
 
         // Filter out only the owned leagues
-        List<League> leagues = userLeagueFetcher.getLeagues();
+        List<League> leagues = userLeagueFetcher.getUserLeagues(auth.getUid());
         List<League> ownedLeagues = new ArrayList<League>();
         for (League league : leagues) {
             if (league.getLeagueOwnerUID().equals(auth.getUid()))
