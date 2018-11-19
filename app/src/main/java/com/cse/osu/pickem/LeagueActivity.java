@@ -42,11 +42,6 @@ public class LeagueActivity extends AppCompatActivity
 
     private EditText leagueIDTextField;
     private EditText leagueNameTextField;
-    private EditText leagueOutput;
-    private TextView yourLeaguesTextView;
-    private Button createLeagueButton;
-    private Button joinLeagueButton;
-    private Button leaveLeagueButton;
     private FirebaseAuth auth;
 
     @Override
@@ -69,7 +64,6 @@ public class LeagueActivity extends AppCompatActivity
                     .commit();
         }
 
-
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -91,13 +85,13 @@ public class LeagueActivity extends AppCompatActivity
         handleLeaveLeagueButton();
 
         // Have yourLeaguesTextView display user's id
-        yourLeaguesTextView = findViewById(R.id.yourLeaguesTextView);
+        TextView yourLeaguesTextView = findViewById(R.id.yourLeaguesTextView);
         yourLeaguesTextView.setText("Your UID: " + auth.getUid());
     }
 
     private void handleCreateLeagueButton() {
         // League Creation
-        createLeagueButton = findViewById(R.id.buttonCreateLeague);
+        Button createLeagueButton = findViewById(R.id.buttonCreateLeague);
         createLeagueButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -127,7 +121,7 @@ public class LeagueActivity extends AppCompatActivity
 
     private void handleJoinLeagueButton() {
         // League Join
-        joinLeagueButton = findViewById(R.id.buttonJoinLeague);
+        Button joinLeagueButton = findViewById(R.id.buttonJoinLeague);
         joinLeagueButton.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -139,7 +133,7 @@ public class LeagueActivity extends AppCompatActivity
     }
 
     private void handleLeaveLeagueButton() {
-        leaveLeagueButton = findViewById(R.id.buttonLeaveLeague);
+        Button leaveLeagueButton = findViewById(R.id.buttonLeaveLeague);
         leaveLeagueButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -274,7 +268,4 @@ public class LeagueActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
-
-
-
 }
