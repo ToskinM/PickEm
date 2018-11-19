@@ -3,6 +3,7 @@ package com.cse.osu.pickem;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.provider.ContactsContract;
+import android.service.autofill.Dataset;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.widget.Toast;
@@ -60,17 +61,13 @@ public class Game implements Parcelable {
                         picksReference.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                picksToRemove.clear();
                                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                                     Pick tempPick = snapshot.getValue(Pick.class);
-                                    if (tempPick.getGameID().equals(gameID)) {
-                                        picksToRemove.add(tempPick);
-                                    }
                                     calculatePoints(tempPick, teamAFinalScore, teamBFinalScore);
                                     DatabaseReference gamesReference = FirebaseDatabase.getInstance().getReference("games");
                                     gamesReference = gamesReference.child(gameID);
                                     gamesReference.removeValue();
-                                    removePicks(picksToRemove);
+                                    removePicks();
                                 }
                             }
 
@@ -93,18 +90,25 @@ public class Game implements Parcelable {
 
     }
 
-    protected void populatePickList() {
+
+    protected void removePicks() {
         picksReference = FirebaseDatabase.getInstance().getReference("picks");
         picksReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                picksToRemove.clear();
+                List<Pick> picksToRemove = new ArrayList<>();
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Pick tempPick = snapshot.getValue(Pick.class);
                     if (tempPick.getGameID().equals(gameID)) {
                         picksToRemove.add(tempPick);
                     }
                 }
+
+                for (Pick pick : picksToRemove) {
+                    picksReference.child(pick.getPickID()).removeValue();
+                }
+
+                picksToRemove.clear();
             }
 
             @Override
@@ -112,22 +116,6 @@ public class Game implements Parcelable {
 
             }
         });
-    }
-
-    protected void removePicks() {
-        populatePickList();
-        Log.d("PickEm", "Pick List length: " + picksToRemove.size());
-        for (Pick pick : picksToRemove) {
-            picksReference.child(pick.getPickID()).removeValue();
-        }
-        picksToRemove.clear();
-    }
-
-    protected void removePicks(List<Pick> tempPicksToRemove) {
-        for (Pick pick : tempPicksToRemove) {
-            picksReference.child(pick.getPickID()).removeValue();
-        }
-        picksToRemove.clear();
     }
 
     protected void calculatePoints(final Pick pick, int actualScoreA, int actualScoreB) {

@@ -16,6 +16,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import java.util.Date;
 
 public class League implements Parcelable {
@@ -130,6 +133,33 @@ public class League implements Parcelable {
             }
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
+            }
+        });
+    }
+
+    public static void deleteLeagueGames(final String leagueID) {
+        final DatabaseReference gamesReference = FirebaseDatabase.getInstance().getReference("games");
+        gamesReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                List<Game> gamesToRemove = new ArrayList<>();
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Game tempGame = snapshot.getValue(Game.class);
+                    if (tempGame.getLeagueID().equals(leagueID)) {
+                        gamesToRemove.add(tempGame);
+                    }
+                }
+
+                for (Game game : gamesToRemove) {
+                    gamesReference.child(game.getGameID()).removeValue();
+                }
+
+                gamesToRemove.clear();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
             }
         });
     }
