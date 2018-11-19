@@ -41,6 +41,8 @@ public class Game implements Parcelable {
     }
 
 
+    private List<Pick> picksToRemove = new ArrayList<>();
+
     public void endGame(final String gameID, final int teamAFinalScore, final int teamBFinalScore) {
         picksReference = FirebaseDatabase.getInstance().getReference("picks");
         leagueMemberReference = FirebaseDatabase.getInstance().getReference("leagueMembers");
@@ -57,6 +59,7 @@ public class Game implements Parcelable {
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                                     Pick tempPick = snapshot.getValue(Pick.class);
+                                    picksToRemove.add(tempPick);
                                     calculatePoints(tempPick, teamAFinalScore, teamBFinalScore);
                                     DatabaseReference gamesReference = FirebaseDatabase.getInstance().getReference("games");
                                     gamesReference = gamesReference.child(gameID);
@@ -81,10 +84,9 @@ public class Game implements Parcelable {
 
 
 
-
-
-
     }
+
+
 
     protected void calculatePoints(final Pick pick, int actualScoreA, int actualScoreB) {
         boolean teamAWon = actualScoreA > actualScoreB;
