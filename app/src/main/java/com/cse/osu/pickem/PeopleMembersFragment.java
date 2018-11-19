@@ -84,7 +84,7 @@ public class PeopleMembersFragment extends Fragment {
 
     private void updateUI() {
         // Get user's owned leagues
-        LeagueMembersFetcher leagueMembersFetcher = LeagueMembersFetcher.get(getActivity());
+        LeagueMembersFetcher leagueMembersFetcher = LeagueMembersFetcher.get();
 
         // Filter out only the owned leagues
         List<LeagueMemberPair> members = leagueMembersFetcher.getMembersOfLeague(mLeagueID);
@@ -179,7 +179,7 @@ public class PeopleMembersFragment extends Fragment {
             removeButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    League.removeMemberFromLeague(mLeagueID, mMember.getUID());
+                    League.removeMember(mLeagueID, mMember.getUID());
                 }
             });
 

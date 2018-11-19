@@ -2,9 +2,7 @@ package com.cse.osu.pickem;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -12,24 +10,23 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
-public class UserLeagueFetcher {
+public class LeagueFetcher {
     public static final String TAG = "LeagueFetcher";
-    private static UserLeagueFetcher sUserLeagueFetcher;
+    private static LeagueFetcher sLeagueFetcher;
 
     private List<League> mAllLeagues;
     private List<LeagueMemberPair> mAllLeagueMembers;
 
-    public static UserLeagueFetcher get(Context context) {
-        if (sUserLeagueFetcher == null) {
-            sUserLeagueFetcher = new UserLeagueFetcher(context);
+    public static LeagueFetcher get() {
+        if (sLeagueFetcher == null) {
+            sLeagueFetcher = new LeagueFetcher();
         }
-        return sUserLeagueFetcher;
+        return sLeagueFetcher;
     }
 
-    private UserLeagueFetcher(Context context) {
+    private LeagueFetcher() {
         this.mAllLeagues = new ArrayList<>();
         this.mAllLeagueMembers = new ArrayList<>();
         setupDatabaseListeners();

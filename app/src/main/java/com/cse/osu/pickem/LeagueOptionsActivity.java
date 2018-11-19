@@ -63,7 +63,6 @@ public class LeagueOptionsActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_league_options);
 
-
         // Create game RecyclerView Fragment
         FragmentManager fm = getSupportFragmentManager();
         Fragment fragment = fm.findFragmentById(R.id.fragment_container);

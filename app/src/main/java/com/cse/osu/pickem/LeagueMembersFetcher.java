@@ -21,14 +21,14 @@ public class LeagueMembersFetcher {
     // List of leagues to be sent to recycler view
     private List<LeagueMemberPair> mAllMembers;
 
-    public static LeagueMembersFetcher get(Context context) {
+    public static LeagueMembersFetcher get() {
         if (sLeagueMembersFetcher == null) {
-            sLeagueMembersFetcher = new LeagueMembersFetcher(context);
+            sLeagueMembersFetcher = new LeagueMembersFetcher();
         }
         return sLeagueMembersFetcher;
     }
 
-    private LeagueMembersFetcher(Context context) {
+    private LeagueMembersFetcher() {
         this.mAllMembers = new ArrayList<>();
         setupDatabaseListeners();
 

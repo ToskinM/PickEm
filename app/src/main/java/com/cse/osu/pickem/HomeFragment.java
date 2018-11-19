@@ -30,8 +30,8 @@ public class HomeFragment extends Fragment {
     private RecyclerView mGameRecyclerView;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private GameAdapter mAdapter;
-    UserLeagueFetcher userLeagueFetcher;
-    UserGameFetcher userGameFetcher;
+    LeagueFetcher mLeagueFetcher;
+    GameFetcher mGameFetcher;
     List<Pair<Game, League>> gameLeaguePairs = new ArrayList<>();
     private FirebaseAuth auth;
 
@@ -64,8 +64,8 @@ public class HomeFragment extends Fragment {
         // Setup Listeners
         setupDatabaseListeners();
 
-        userLeagueFetcher = UserLeagueFetcher.get(getActivity());
-        userGameFetcher = UserGameFetcher.get(getActivity());
+        mLeagueFetcher = LeagueFetcher.get();
+        mGameFetcher = GameFetcher.get();
 
         updateUI();
 
@@ -84,10 +84,10 @@ public class HomeFragment extends Fragment {
 
     private void updateUI() {
         gameLeaguePairs.clear();
-        List<League> leagues = userLeagueFetcher.getUserLeagues(auth.getUid());
+        List<League> leagues = mLeagueFetcher.getUserLeagues(auth.getUid());
         Log.d(TAG,"" + leagues.size());
         for (League league : leagues){
-            List<Game> games = userGameFetcher.getGamesOfLeague(league.getLeagueID());
+            List<Game> games = mGameFetcher.getGamesOfLeague(league.getLeagueID());
             Log.d(TAG,"" + games.size());
             for (Game game : games){
                 Pair<Game, League> pair = new Pair<>(game, league);

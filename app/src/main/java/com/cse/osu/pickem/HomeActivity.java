@@ -70,6 +70,11 @@ public class HomeActivity extends AppCompatActivity
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        // Startup fetchers
+        LeagueFetcher leagueFetcher = LeagueFetcher.get();
+        LeagueMembersFetcher leagueMembersFetcher = LeagueMembersFetcher.get();
+        GameFetcher gameFetcher = GameFetcher.get();
+
         // Create RecyclerView Fragment
         FragmentManager fm = getSupportFragmentManager();
         Fragment fragment = fm.findFragmentById(R.id.fragment_container);

@@ -13,19 +13,19 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UserGameFetcher {
+public class GameFetcher {
     public static final String TAG = "GameFetcher";
-    private static UserGameFetcher sUserGameFetcher;
+    private static GameFetcher sGameFetcher;
     private List<Game> mFetchedGames;
 
-    public static UserGameFetcher get(Context context) {
-        if (sUserGameFetcher == null) {
-            sUserGameFetcher = new UserGameFetcher(context);
+    public static GameFetcher get() {
+        if (sGameFetcher == null) {
+            sGameFetcher = new GameFetcher();
         }
-        return sUserGameFetcher;
+        return sGameFetcher;
     }
 
-    private UserGameFetcher(Context context) {
+    private GameFetcher() {
         this.mFetchedGames = new ArrayList<>();
         setupDatabaseListeners();
     }
