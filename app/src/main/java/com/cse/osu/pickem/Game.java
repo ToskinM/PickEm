@@ -44,9 +44,6 @@ public class Game implements Parcelable {
         this.leagueID = leagueID;
     }
 
-
-
-
     public void endGame(final String gameID, final int teamAFinalScore, final int teamBFinalScore) {
         picksReference = FirebaseDatabase.getInstance().getReference("picks");
         leagueMemberReference = FirebaseDatabase.getInstance().getReference("leagueMembers");
@@ -90,7 +87,7 @@ public class Game implements Parcelable {
 
     }
 
-
+    // Removes all picks for this game
     protected void removePicks() {
         picksReference = FirebaseDatabase.getInstance().getReference("picks");
         picksReference.addListenerForSingleValueEvent(new ValueEventListener() {

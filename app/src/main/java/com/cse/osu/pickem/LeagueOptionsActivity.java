@@ -29,8 +29,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.Date;
-
 public class LeagueOptionsActivity extends AppCompatActivity {
 
     public static final String TAG = "LeagueOptionsActivity";
@@ -222,57 +220,68 @@ public class LeagueOptionsActivity extends AppCompatActivity {
     }
 
     private void deleteLeague() {
-        //Need to access firebase, set up listener
-        gameDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    Game tempGame = snapshot.getValue(Game.class);
-                    if (tempGame.getLeagueID().equals(mLeague.getLeagueID())) {
-                        Log.d("PickEm", "Added game: " + tempGame.getGameID());
-                        tempGame.removePicks();
-                    }
-                }
-            }
+        if (auth.getUid().equals(mLeague.getLeagueOwnerUID())){
+            mLeague.deleteLeague();
+        }
+        else {
+            // Cannot delete league as current user isn't owner
+        }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-        League.deleteLeagueGames(mLeague.getLeagueID());
-
-        leagueDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    //Get the current league on Firebase we are looking at
-                    League snapshotLeague = snapshot.getValue(League.class);
-
-                    //If current user owns the league, and the league is the target league,
-                    if (snapshotLeague.getLeagueOwnerUID().equals(auth.getUid()) && snapshotLeague.getLeagueID().equals(mLeague.getLeagueID())) {
-
-                        //Delete all of the league member pairs related to the target league
-                        deleteLeagueMembers();
-
-                        //Delete league.
-                        leagueDatabaseReference.child(mLeague.getLeagueID()).removeValue(new DatabaseReference.CompletionListener() {
-                            @Override
-                            public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
-                                Log.d(TAG, mLeague.getLeagueID() + " has been deleted.");
-                            }
-                        });
-                    }
-                }
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
+//        // Delete all picks of games on the league
+//        gameDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+//                    Game tempGame = snapshot.getValue(Game.class);
+//                    if (tempGame.getLeagueID().equals(mLeague.getLeagueID())) {
+//                        Log.d("PickEm", "Added game: " + tempGame.getGameID());
+//                        tempGame.removePicks();
+//                    }
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//            }
+//        });
+//
+//        // Delete games in league
+//        mLeague.deleteGames();
+//
+//        // Delete the league
+//        leagueDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+//                    //Get the current league on Firebase we are looking at
+//                    League snapshotLeague = snapshot.getValue(League.class);
+//
+//                    //If current user owns the league, and the league is the target league,
+//                    if (snapshotLeague.getLeagueOwnerUID().equals(auth.getUid()) && snapshotLeague.getLeagueID().equals(mLeague.getLeagueID())) {
+//
+//                        //Delete all of the league member pairs related to the target league
+//                        deleteLeagueMembers();
+//
+//                        //Delete league.
+//                        leagueDatabaseReference.child(mLeague.getLeagueID()).removeValue(new DatabaseReference.CompletionListener() {
+//                            @Override
+//                            public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
+//                                Log.d(TAG, mLeague.getLeagueID() + " has been deleted.");
+//                            }
+//                        });
+//                    }
+//                }
+//            }
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//            }
+//        });
 
         finish();
     }
+
     protected void deleteLeagueMembers() {
         leagueMembersDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override

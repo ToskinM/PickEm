@@ -21,6 +21,8 @@ import java.util.List;
 
 import java.util.Date;
 
+import static com.cse.osu.pickem.LeagueOptionsActivity.TAG;
+
 public class League implements Parcelable {
 
     private String leagueName;
@@ -137,8 +139,10 @@ public class League implements Parcelable {
         });
     }
 
-    public static void deleteLeagueGames(final String leagueID) {
+    // Delete all the games and their picks
+    public void deleteGames() {
         final DatabaseReference gamesReference = FirebaseDatabase.getInstance().getReference("games");
+
         gamesReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -146,6 +150,8 @@ public class League implements Parcelable {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Game tempGame = snapshot.getValue(Game.class);
                     if (tempGame.getLeagueID().equals(leagueID)) {
+                        // Delete all picks of games in league
+                        tempGame.removePicks();
                         gamesToRemove.add(tempGame);
                     }
                 }
@@ -157,6 +163,35 @@ public class League implements Parcelable {
                 gamesToRemove.clear();
             }
 
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    public void deleteLeague(){
+        deleteGames();
+        deleteAllMembers();
+
+        final DatabaseReference leagueDatabaseReference = FirebaseDatabase.getInstance().getReference("leagues");
+        // Delete the league
+        leagueDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    //Get the current league on Firebase we are looking at
+                    League snapshotLeague = snapshot.getValue(League.class);
+
+                    //Delete league.
+                    leagueDatabaseReference.child(leagueID).removeValue(new DatabaseReference.CompletionListener() {
+                        @Override
+                        public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
+                            Log.d(TAG, leagueID + " has been deleted.");
+                        }
+                    });
+                }
+            }
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
@@ -193,6 +228,34 @@ public class League implements Parcelable {
         FirebaseDatabase.getInstance().getReference("leagues").child(leagueID).setValue(this);
         // Add owner to league
         FirebaseDatabase.getInstance().getReference("leagueMembers").push().setValue(new LeagueMemberPair(leagueOwnerUID, leagueID));
+    }
+
+    public void deleteAllMembers(){
+        // Deletes all members of this league
+        FirebaseDatabase.getInstance().getReference("leagueMembers").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    LeagueMemberPair pair = snapshot.getValue(LeagueMemberPair.class);
+                    //If the pair being examined is the target
+                    if (pair.getLeagueID().equals(leagueID)) {
+
+                        //Get a reference to the pair, and then delete it.
+                        snapshot.getRef().removeValue(new DatabaseReference.CompletionListener() {
+                            @Override
+                            public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
+                                Log.d(TAG, "League members deleted for the League: " + leagueID);
+                            }
+                        });
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 
     public void addGame(String teamAName, String teamBName, String daysText){
