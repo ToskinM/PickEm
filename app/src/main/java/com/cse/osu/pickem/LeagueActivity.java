@@ -40,7 +40,6 @@ public class LeagueActivity extends AppCompatActivity
 
     public static final String TAG = "PickEm";
 
-
     private EditText leagueIDTextField;
     private EditText leagueNameTextField;
     private EditText leagueOutput;
@@ -48,13 +47,53 @@ public class LeagueActivity extends AppCompatActivity
     private Button createLeagueButton;
     private Button joinLeagueButton;
     private Button leaveLeagueButton;
-    private DatabaseReference leaguesDatabaseReference;
-    private DatabaseReference leagueMemberDatabaseReference;
     private FirebaseAuth auth;
 
-    private List<League> loadedLeagues = new ArrayList<>();
-    private Set<LeagueMemberPair> loadedLeagueMemberPairs = new HashSet<LeagueMemberPair>();
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Log.d(TAG, "LeagueActivity: onCreate() called!");
+        setContentView(R.layout.activity_leagues);
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
+        auth = FirebaseAuth.getInstance();
+
+        // Create league RecyclerView Fragment
+        FragmentManager fm = getSupportFragmentManager();
+        Fragment fragment = fm.findFragmentById(R.id.fragment_container);
+        if (fragment == null) {
+            fragment = new LeagueListFragment();
+            fm.beginTransaction()
+                    .add(R.id.fragment_container, fragment)
+                    .commit();
+        }
+
+
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
+        setUp(savedInstanceState);
+    }
+
+    private void setUp(Bundle savedInstanceState) {
+        leagueIDTextField = findViewById(R.id.league_id_field);
+        leagueNameTextField = findViewById(R.id.league_name_field);
+
+        handleCreateLeagueButton();
+        handleJoinLeagueButton();
+        handleLeaveLeagueButton();
+
+        // Have yourLeaguesTextView display user's id
+        yourLeaguesTextView = findViewById(R.id.yourLeaguesTextView);
+        yourLeaguesTextView.setText("Your UID: " + auth.getUid());
+    }
 
     private void handleCreateLeagueButton() {
         // League Creation
@@ -64,20 +103,54 @@ public class LeagueActivity extends AppCompatActivity
             public void onClick(View v) {
                 String id = leagueIDTextField.getText().toString().trim();
                 if (!id.equals("")) {
+                    // Cancel process if league with same ID already exists
+                    for (League league : LeagueFetcher.get().getAllLeagues()){
+                        if (id.equals(league.getLeagueID())){
+                            AlertDialog alertDialog = new AlertDialog.Builder(LeagueActivity.this).create();
+                            alertDialog.setMessage("League with that ID already exists!");
+                            alertDialog.show();
+                            return;
+                        }
+                    }
+
                     String name = leagueNameTextField.getText().toString().trim();
-                    //Set up new league, and add it to firebase
-                    League newLeague = new League(name, id, auth.getCurrentUser().getUid());
-                    leaguesDatabaseReference.child(id).setValue(newLeague);
-                    leagueMemberDatabaseReference.push().setValue(new LeagueMemberPair(auth.getUid(), newLeague.getLeagueID()));
+                    League.createLeague(id, name, auth.getUid());
                 } else {
                     //Error handling
                     AlertDialog alertDialog = new AlertDialog.Builder(LeagueActivity.this).create();
-                    alertDialog.setMessage("LeagueID cannot be empty!");
+                    alertDialog.setMessage("League ID cannot be empty!");
                     alertDialog.show();
                 }
             }
         });
     }
+
+    private void handleJoinLeagueButton() {
+        // League Join
+        joinLeagueButton = findViewById(R.id.buttonJoinLeague);
+        joinLeagueButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                leagueNameTextField.setText("");  // Clear text in league name
+                League.addMember(leagueIDTextField.getText().toString().trim(), auth.getUid());
+            }
+        });
+    }
+
+    private void handleLeaveLeagueButton() {
+        leaveLeagueButton = findViewById(R.id.buttonLeaveLeague);
+        leaveLeagueButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String currentUserID = auth.getUid();
+                String enteredLeagueID = leagueIDTextField.getText().toString().trim();
+                League.removeMember(enteredLeagueID, currentUserID);
+            }
+        });
+    }
+
+    // Depreciated, kept for prosperity
     private AlertDialog createCreateLeagueDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(LeagueActivity.this);
         // Get the layout inflater
@@ -99,9 +172,7 @@ public class LeagueActivity extends AppCompatActivity
                         String leagueName = leagueNameEditText.getText().toString().trim();
 
                         if (!leagueID.equals("")) {
-                            //Set up new league, and add it to firebase
-                            League newLeague = new League(leagueName, leagueID, auth.getCurrentUser().getUid());
-                            leaguesDatabaseReference.child(leagueID).setValue(newLeague);
+                            League.createLeague(leagueID, leagueName, auth.getUid());
                         } else {
                             //Error handling
                             AlertDialog alertDialog = new AlertDialog.Builder(LeagueActivity.this).create();
@@ -117,19 +188,7 @@ public class LeagueActivity extends AppCompatActivity
                 });
         return builder.create();
     }
-
-    private void handleJoinLeagueButton() {
-        // League Join
-        joinLeagueButton = findViewById(R.id.buttonJoinLeague);
-        joinLeagueButton.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                leagueNameTextField.setText(""); //Clear text in league name
-                League.addMember(leagueIDTextField.getText().toString().trim(), auth.getUid());
-            }
-        });
-    }
+    // Depreciated, kept for prosperity
     private AlertDialog createJoinLeagueDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(LeagueActivity.this);
         // Get the layout inflater
@@ -157,105 +216,6 @@ public class LeagueActivity extends AppCompatActivity
                     }
                 });
         return builder.create();
-    }
-
-    private void handleLeaveLeagueButton() {
-        leaveLeagueButton = findViewById(R.id.buttonLeaveLeague);
-        leaveLeagueButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String currentUserID = auth.getUid();
-                String enteredLeagueID = leagueIDTextField.getText().toString().trim();
-                League.removeMember(enteredLeagueID, currentUserID);
-            }
-        });
-    }
-
-
-
-    private void setUp(Bundle savedInstanceState) {
-        leagueIDTextField = findViewById(R.id.league_id_field);
-        leagueNameTextField = findViewById(R.id.league_name_field);
-
-        handleCreateLeagueButton();
-        handleJoinLeagueButton();
-        handleLeaveLeagueButton();
-
-        // Have yourLeaguesTextView display user's id
-        yourLeaguesTextView = findViewById(R.id.yourLeaguesTextView);
-        yourLeaguesTextView.setText("Your UID: " + auth.getUid());
-    }
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        Log.d(TAG, "LeagueActivity: onCreate() called!");
-        setContentView(R.layout.activity_leagues);
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        auth = FirebaseAuth.getInstance();
-
-        // Create league RecyclerView Fragment
-        FragmentManager fm = getSupportFragmentManager();
-        Fragment fragment = fm.findFragmentById(R.id.fragment_container);
-        if (fragment == null) {
-            fragment = new LeagueListFragment();
-            fm.beginTransaction()
-                    .add(R.id.fragment_container, fragment)
-                    .commit();
-        }
-
-
-        leaguesDatabaseReference = FirebaseDatabase.getInstance().getReference("leagues");
-        leagueMemberDatabaseReference = FirebaseDatabase.getInstance().getReference("leagueMembers");
-
-        // Get all league members
-        leagueMemberDatabaseReference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for(DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    loadedLeagueMemberPairs.clear();
-                    LeagueMemberPair tempPair = snapshot.getValue(LeagueMemberPair.class);
-                    if (!loadedLeagueMemberPairs.contains(tempPair)) {
-                        loadedLeagueMemberPairs.add(tempPair);
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-
-        // Get all leagues
-        leaguesDatabaseReference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                loadedLeagues.clear();
-                for (DataSnapshot data : dataSnapshot.getChildren()) {
-                    loadedLeagues.add(data.getValue(League.class));
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                Log.d("PickEm", "ON CANCELLED!");
-            }
-        });
-
-
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.addDrawerListener(toggle);
-        toggle.syncState();
-
-        NavigationView navigationView = findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-
-        setUp(savedInstanceState);
     }
 
     @Override
