@@ -7,6 +7,16 @@ public class Pick implements Parcelable {
 
     private String UserID;
     private String GameID;
+
+    public String getPickID() {
+        return PickID;
+    }
+
+    public void setPickID(String pickID) {
+        PickID = pickID;
+    }
+
+    private String PickID;
     private int TeamAScore;
 
     public String getUserID() {

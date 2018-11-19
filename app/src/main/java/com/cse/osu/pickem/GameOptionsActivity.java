@@ -140,7 +140,10 @@ public class GameOptionsActivity extends AppCompatActivity {
     protected boolean addPick(final Pick pick) {
         boolean returnValue = true;
         if (!pickAlreadyExistsForCurrentUser()) {
-            pickDatabaseReference.push().setValue(pick);
+            DatabaseReference newRef = pickDatabaseReference.push();
+            String pickKey = newRef.getKey();
+            pick.setPickID(pickKey);
+            newRef.setValue(pick);
         } else {
             returnValue = false;
         }
