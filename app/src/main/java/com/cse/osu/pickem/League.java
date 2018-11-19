@@ -102,10 +102,11 @@ public class League implements Parcelable {
     }
 
     // Removes user with the indicated Firebase UID from the league
-    public static void removeMemberFromLeague(final String leagueID, final String userID){
+    public static void removeMember(final String leagueID, final String userID){
         // Get database references
         DatabaseReference leagueMemberDatabaseReference = FirebaseDatabase.getInstance().getReference("leagueMembers");
-        // League Members listener
+
+        // Find and delete users pair to league
         leagueMemberDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -125,5 +126,29 @@ public class League implements Parcelable {
             public void onCancelled(@NonNull DatabaseError databaseError) {
             }
         });
+    }
+
+    public static void addMember(final String leagueID, final String userID){
+        // Get database references
+        DatabaseReference leagueMemberDatabaseReference = FirebaseDatabase.getInstance().getReference("leagueMembers");
+        LeagueFetcher leagueFetcher = LeagueFetcher.get();
+        LeagueMembersFetcher leagueMembersFetcher = LeagueMembersFetcher.get();
+
+        LeagueMemberPair pairToAdd = new LeagueMemberPair(userID, leagueID);
+        boolean okToAdd = false;
+
+        //Ensure league exists
+        for (League league : leagueFetcher.getAllLeagues())
+            if (league.getLeagueID().equals(leagueID))
+                okToAdd = true;
+
+        //Ensure user isn't already a member of the league
+        for (LeagueMemberPair testPair : leagueMembersFetcher.getMembersOfLeague(leagueID))
+            if (testPair.equals(pairToAdd))
+                okToAdd = false;
+
+        // Passes all tests, add new league pair
+        if (okToAdd)
+            leagueMemberDatabaseReference.push().setValue(pairToAdd);
     }
 }

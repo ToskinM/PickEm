@@ -77,8 +77,8 @@ public class GameListFragment extends Fragment {
 
     private void updateUI() {
         // Get user's owned leagues
-        UserGameFetcher userGameFetcher = UserGameFetcher.get(getActivity());
-        List<Game> games = userGameFetcher.getGamesOfLeague(mLeagueID);
+        GameFetcher gameFetcher = GameFetcher.get();
+        List<Game> games = gameFetcher.getGamesOfLeague(mLeagueID);
 
         mAdapter = new GameAdapter(games);
         mGameRecyclerView.removeAllViews();

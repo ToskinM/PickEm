@@ -5,7 +5,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
@@ -23,7 +22,6 @@ import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -169,28 +167,7 @@ public class LeagueActivity extends AppCompatActivity
                         EditText leagueIDEditText = d.findViewById(R.id.league_id);
                         String leagueID = leagueIDEditText.getText().toString().trim();
 
-                        LeagueMemberPair pairToAdd = new LeagueMemberPair(auth.getUid(), leagueID);
-                        boolean okToAdd = false;
-
-                        //Ensure league exists
-                        for (League league : loadedLeagues) {
-                            if (league.getLeagueID().equals(leagueID)) {
-                                okToAdd = true;
-                            }
-                        }
-
-                        //Ensure user isn't already a member of the league
-                        for (LeagueMemberPair testPair : loadedLeagueMemberPairs) {
-                            if (testPair.equals(pairToAdd)) {
-                                Log.d("PickEm", "Already exists in thing");
-                                okToAdd = false;
-                            }
-                        }
-
-                        //Passes all tests, add new league pair
-                        if (okToAdd) {
-                            leagueMemberDatabaseReference.push().setValue(pairToAdd);
-                        }
+                        League.addMember(leagueID, auth.getUid());
                     }
                 })
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -206,43 +183,9 @@ public class LeagueActivity extends AppCompatActivity
         leaveLeagueButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                leagueMemberDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-                        String currentUserID = auth.getUid();
-                        String enteredLeagueID = leagueIDTextField.getText().toString().trim();
-                        LeagueMemberPair currentPair = new LeagueMemberPair(currentUserID, enteredLeagueID);
-
-                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-
-                            //Get info about the league on firebase currently being examined
-                            String snapshotUserID = snapshot.getValue(LeagueMemberPair.class).getUID();
-                            String snapshotLeagueID = snapshot.getValue(LeagueMemberPair.class).getLeagueID();
-
-                            //Create actual league member pair for firebase league
-                            LeagueMemberPair snapshotPair = new LeagueMemberPair(snapshotUserID, snapshotLeagueID);
-
-                            //If the current pair (userId/text field) matches the pair on firebase,
-                            if (snapshotPair.equals(currentPair)) {
-
-                                //Remove the league member pair, leaving the league.
-                                snapshot.getRef().removeValue(new DatabaseReference.CompletionListener() {
-                                    @Override
-                                    public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
-                                        Toast.makeText(LeagueActivity.this, "Removed pair!", Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                    }
-                });
+                String currentUserID = auth.getUid();
+                String enteredLeagueID = leagueIDTextField.getText().toString().trim();
+                League.removeMember(enteredLeagueID, currentUserID);
             }
         });
     }
@@ -282,10 +225,11 @@ public class LeagueActivity extends AppCompatActivity
                     .commit();
         }
 
+
         leaguesDatabaseReference = FirebaseDatabase.getInstance().getReference("leagues");
         leagueMemberDatabaseReference = FirebaseDatabase.getInstance().getReference("leagueMembers");
 
-
+        // Get all league members
         leagueMemberDatabaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -304,6 +248,7 @@ public class LeagueActivity extends AppCompatActivity
             }
         });
 
+        // Get all leagues
         leaguesDatabaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {

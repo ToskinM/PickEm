@@ -114,8 +114,8 @@ public class LeagueListFragment extends Fragment {
 
     private void updateUI() {
         // Get user's owned leagues
-        UserLeagueFetcher userLeagueFetcher = UserLeagueFetcher.get(getActivity());
-        List<League> leagues = userLeagueFetcher.getUserLeagues(auth.getUid());
+        LeagueFetcher leagueFetcher = LeagueFetcher.get();
+        List<League> leagues = leagueFetcher.getUserLeagues(auth.getUid());
 
         mAdapter = new LeagueAdapter(leagues);
         mLeagueRecyclerView.removeAllViews();

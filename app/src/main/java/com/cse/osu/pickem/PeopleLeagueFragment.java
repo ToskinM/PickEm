@@ -26,7 +26,6 @@ import java.util.List;
 public class PeopleLeagueFragment extends Fragment {
     public static final String TAG = "LeagueListFragment";
     private RecyclerView mPeopleRecyclerView;
-    private DatabaseReference leaguesDatabaseReference;
     private LeagueAdapter mAdapter;
     private FirebaseAuth auth;
     private SwipeRefreshLayout mSwipeRefreshLayout;
@@ -77,10 +76,10 @@ public class PeopleLeagueFragment extends Fragment {
 
     private void updateUI() {
         // Get user's owned leagues
-        UserLeagueFetcher userLeagueFetcher = UserLeagueFetcher.get(getActivity());
+        LeagueFetcher leagueFetcher = LeagueFetcher.get();
 
         // Filter out only the owned leagues
-        List<League> leagues = userLeagueFetcher.getUserLeagues(auth.getUid());
+        List<League> leagues = leagueFetcher.getUserLeagues(auth.getUid());
         List<League> ownedLeagues = new ArrayList<League>();
         for (League league : leagues) {
             if (league.getLeagueOwnerUID().equals(auth.getUid()))

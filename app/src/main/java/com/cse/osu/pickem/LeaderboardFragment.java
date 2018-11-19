@@ -55,7 +55,7 @@ public class LeaderboardFragment extends Fragment {
 
     private void buildLeaderoard(){
         mTableLayout.removeAllViewsInLayout();
-        LeagueMembersFetcher leagueMembersFetcher = LeagueMembersFetcher.get(getActivity());
+        LeagueMembersFetcher leagueMembersFetcher = LeagueMembersFetcher.get();
         List<LeagueMemberPair> leagueMembers = leagueMembersFetcher.getMembersOfLeague(mLeagueID);
         for (LeagueMemberPair member : leagueMembers){
             addLeaderboardRow(member.getUID(), member.getPoints());
