@@ -234,7 +234,27 @@ public class LeagueOptionsActivity extends AppCompatActivity {
     }
 
     private void deleteLeague() {
+        //TODO: FINISH DEBUGGING THIS Y U NO WORK
         //Need to access firebase, set up listener
+        gameDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Game tempGame = snapshot.getValue(Game.class);
+                    if (tempGame.getLeagueID().equals(mLeague.getLeagueID())) {
+                        Log.d("PickEm", "Added game: " + tempGame.getGameID());
+                        tempGame.removePicks();
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+
         leagueDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {

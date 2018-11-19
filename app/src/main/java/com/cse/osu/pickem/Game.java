@@ -30,6 +30,9 @@ public class Game implements Parcelable {
     private Date mLockTime;
     private String gameID;
 
+    @Exclude
+    private List<Pick> picksToRemove = new ArrayList<>();
+
     private DatabaseReference picksReference;
     private DatabaseReference leagueMemberReference;
     private FirebaseAuth auth = FirebaseAuth.getInstance();
@@ -41,7 +44,7 @@ public class Game implements Parcelable {
     }
 
 
-    private List<Pick> picksToRemove = new ArrayList<>();
+
 
     public void endGame(final String gameID, final int teamAFinalScore, final int teamBFinalScore) {
         picksReference = FirebaseDatabase.getInstance().getReference("picks");
@@ -57,13 +60,17 @@ public class Game implements Parcelable {
                         picksReference.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                picksToRemove.clear();
                                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                                     Pick tempPick = snapshot.getValue(Pick.class);
-                                    picksToRemove.add(tempPick);
+                                    if (tempPick.getGameID().equals(gameID)) {
+                                        picksToRemove.add(tempPick);
+                                    }
                                     calculatePoints(tempPick, teamAFinalScore, teamBFinalScore);
                                     DatabaseReference gamesReference = FirebaseDatabase.getInstance().getReference("games");
                                     gamesReference = gamesReference.child(gameID);
                                     gamesReference.removeValue();
+                                    removePicks(picksToRemove);
                                 }
                             }
 
@@ -86,7 +93,42 @@ public class Game implements Parcelable {
 
     }
 
+    protected void populatePickList() {
+        picksReference = FirebaseDatabase.getInstance().getReference("picks");
+        picksReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                picksToRemove.clear();
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Pick tempPick = snapshot.getValue(Pick.class);
+                    if (tempPick.getGameID().equals(gameID)) {
+                        picksToRemove.add(tempPick);
+                    }
+                }
+            }
 
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    protected void removePicks() {
+        populatePickList();
+        Log.d("PickEm", "Pick List length: " + picksToRemove.size());
+        for (Pick pick : picksToRemove) {
+            picksReference.child(pick.getPickID()).removeValue();
+        }
+        picksToRemove.clear();
+    }
+
+    protected void removePicks(List<Pick> tempPicksToRemove) {
+        for (Pick pick : tempPicksToRemove) {
+            picksReference.child(pick.getPickID()).removeValue();
+        }
+        picksToRemove.clear();
+    }
 
     protected void calculatePoints(final Pick pick, int actualScoreA, int actualScoreB) {
         boolean teamAWon = actualScoreA > actualScoreB;
