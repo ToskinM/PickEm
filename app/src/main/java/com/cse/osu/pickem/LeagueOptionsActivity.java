@@ -234,7 +234,6 @@ public class LeagueOptionsActivity extends AppCompatActivity {
     }
 
     private void deleteLeague() {
-        //TODO: FINISH DEBUGGING THIS Y U NO WORK
         //Need to access firebase, set up listener
         gameDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -253,7 +252,7 @@ public class LeagueOptionsActivity extends AppCompatActivity {
 
             }
         });
-
+        League.deleteLeagueGames(mLeague.getLeagueID());
 
         leagueDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -283,6 +282,7 @@ public class LeagueOptionsActivity extends AppCompatActivity {
 
             }
         });
+
         finish();
     }
     protected void deleteLeagueMembers() {
