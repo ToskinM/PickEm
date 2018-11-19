@@ -84,7 +84,15 @@ public class LeagueOptionsActivity extends AppCompatActivity {
         deleteLeagueButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                deleteDialog.show();
+                // Start deletion pre-process if user is owner
+                if (auth.getUid().equals(mLeague.getLeagueOwnerUID()))
+                    deleteDialog.show();
+                else {
+                    // Cannot delete league as current user isn't owner
+                    AlertDialog alertDialog = new AlertDialog.Builder(LeagueOptionsActivity.this).create();
+                    alertDialog.setMessage("Only the owner can delete the league.");
+                    alertDialog.show();
+                }
             }
         });
 
@@ -156,16 +164,6 @@ public class LeagueOptionsActivity extends AppCompatActivity {
                     }
                 });
         return builder.create();
-
-        //final AlertDialog deleteConfirmationDialog = builder.create();
-        // Wire button to show confirmation
-        //deleteLeagueButton = findViewById(R.id.buttonDeleteLeague);
-        //deleteLeagueButton.setOnClickListener(new View.OnClickListener() {
-        //    @Override
-        //    public void onClick(View v) {
-        //        deleteConfirmationDialog.show();
-        //    }
-        //});
     }
 
     protected void setupRenameLeagueButton() {
@@ -220,13 +218,11 @@ public class LeagueOptionsActivity extends AppCompatActivity {
     }
 
     private void deleteLeague() {
+        // Double check user is owner, do nothing if not
         if (auth.getUid().equals(mLeague.getLeagueOwnerUID())){
             mLeague.deleteLeague();
+            finish();
         }
-        else {
-            // Cannot delete league as current user isn't owner
-        }
-
 //        // Delete all picks of games on the league
 //        gameDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
 //            @Override
@@ -278,8 +274,6 @@ public class LeagueOptionsActivity extends AppCompatActivity {
 //
 //            }
 //        });
-
-        finish();
     }
 
     protected void deleteLeagueMembers() {
