@@ -86,41 +86,45 @@ public class LeagueOptionsActivity extends AppCompatActivity {
     protected void setupButtons() {
         // Add Game
         Button addGameButton = findViewById(R.id.buttonAddGame);
-        addGameButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                createAddGameDialog().show();
-            }
-        });
+        if (!FirebaseAuth.getInstance().getUid().equals(mLeague.getLeagueOwnerUID()))
+            addGameButton.setEnabled(false);
+        else {
+            addGameButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    createAddGameDialog().show();
+                }
+            });
+        }
 
         // Delete League
         Button deleteLeagueButton = findViewById(R.id.buttonDeleteLeague);
-        deleteLeagueButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Start deletion pre-process if user is owner
-                if (auth.getUid().equals(mLeague.getLeagueOwnerUID()))
+        if (!FirebaseAuth.getInstance().getUid().equals(mLeague.getLeagueOwnerUID()))
+            deleteLeagueButton.setEnabled(false);
+        else {
+            deleteLeagueButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // Start deletion pre-process if user is owner
                     deleteDialog.show();
-                else {
-                    // Cannot delete league as current user isn't owner
-                    AlertDialog alertDialog = new AlertDialog.Builder(LeagueOptionsActivity.this).create();
-                    alertDialog.setMessage("Only the owner can delete the league.");
-                    alertDialog.show();
                 }
-            }
-        });
+            });
+        }
 
         // Rename League
-        // Build the confirmation dialog once, ahead of time
-        final AlertDialog renameDialog = createRenameDialog();
         // Wire button to show dialog
         Button renameLeagueButton = findViewById(R.id.buttonRenameLeague);
-        renameLeagueButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                renameDialog.show();
-            }
-        });
+        if (!FirebaseAuth.getInstance().getUid().equals(mLeague.getLeagueOwnerUID()))
+            renameLeagueButton.setEnabled(false);
+        else {
+            final AlertDialog renameDialog = createRenameDialog();
+            renameLeagueButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    renameDialog.show();
+                }
+            });
+        }
     }
 
     private AlertDialog createAddGameDialog() {
@@ -133,18 +137,13 @@ public class LeagueOptionsActivity extends AppCompatActivity {
             public void onClick(DialogInterface dialog, int which) {
                 Dialog d = (Dialog) dialog;
 
-                // Only start adding game if user is league owner
-                if (FirebaseAuth.getInstance().getUid().equals(mLeague.getLeagueOwnerUID())) {
-                    // Get game info from edit texts
-                    String teamAText = ((EditText)d.findViewById(R.id.teamA_text)).getText().toString().trim();
-                    String teamBText = ((EditText)d.findViewById(R.id.teamB_text)).getText().toString().trim();
-                    String daysText = ((EditText)d.findViewById(R.id.time_remaining_text)).getText().toString().trim();
+                // Get game info from edit texts
+                String teamAText = ((EditText)d.findViewById(R.id.teamA_text)).getText().toString().trim();
+                String teamBText = ((EditText)d.findViewById(R.id.teamB_text)).getText().toString().trim();
+                String daysText = ((EditText)d.findViewById(R.id.time_remaining_text)).getText().toString().trim();
 
-                    // Add the game
-                    mLeague.addGame(teamAText, teamBText, daysText);
-                } else {
-                    Toast.makeText(LeagueOptionsActivity.this, "Only the owner can make a game!", Toast.LENGTH_SHORT).show();
-                }
+                // Add the game
+                mLeague.addGame(teamAText, teamBText, daysText);
             }
         })
         .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -309,10 +308,18 @@ public class LeagueOptionsActivity extends AppCompatActivity {
         int id = item.getItemId();
         switch (id){
             case R.id.action_addGame:
-                createAddGameDialog().show();
+                if (FirebaseAuth.getInstance().getUid().equals(mLeague.getLeagueOwnerUID())) {
+                    createAddGameDialog().show();
+                } else {
+                    Toast.makeText(LeagueOptionsActivity.this, "Only the owner can make a game!", Toast.LENGTH_SHORT).show();
+                }
                 return true;
             case  R.id.action_rename:
-                renameDialog.show();
+                if (FirebaseAuth.getInstance().getUid().equals(mLeague.getLeagueOwnerUID())) {
+                    renameDialog.show();
+                } else {
+                    Toast.makeText(LeagueOptionsActivity.this, "Only the owner can rename the league!", Toast.LENGTH_SHORT).show();
+                }
                 return true;
             case R.id.action_delete:
                 deleteDialog.show();
