@@ -1,16 +1,22 @@
 package com.cse.osu.pickem;
 
+import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.widget.EditText;
+import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import java.util.Date;
 
 public class League implements Parcelable {
 
@@ -152,11 +158,27 @@ public class League implements Parcelable {
             leagueMemberDatabaseReference.push().setValue(pairToAdd);
     }
 
-    public static void createLeague(final String leagueID, final String leagueName, final String ownerID){
-        League newLeague = new League(leagueName, leagueID, ownerID);
+    public void addToDatabase(){
         // Add the league
-        FirebaseDatabase.getInstance().getReference("leagues").child(leagueID).setValue(newLeague);
+        FirebaseDatabase.getInstance().getReference("leagues").child(leagueID).setValue(this);
         // Add owner to league
-        FirebaseDatabase.getInstance().getReference("leagueMembers").push().setValue(new LeagueMemberPair(ownerID, leagueID));
+        FirebaseDatabase.getInstance().getReference("leagueMembers").push().setValue(new LeagueMemberPair(leagueOwnerUID, leagueID));
+    }
+
+    public void addGame(String teamAName, String teamBName, String daysText){
+        // Create Game object
+        Game newGame = new Game(teamAName, teamBName, leagueID);
+
+        // Setup locktime
+        Date now = new Date();
+        Date lockTime = new Date();
+        int days = Integer.parseInt(daysText);
+        lockTime.setTime(now.getTime() + 86400000L * (long)days);
+        newGame.setLockTime(lockTime);
+
+        // Add game to database
+        DatabaseReference tempReference = FirebaseDatabase.getInstance().getReference("games").push();
+        newGame.setGameID(tempReference.getKey());
+        tempReference.setValue(newGame);
     }
 }

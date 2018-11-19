@@ -108,8 +108,7 @@ public class LeagueOptionsActivity extends AppCompatActivity {
             }
         });
     }
-
-    protected AlertDialog addGameDialog() {
+    private AlertDialog addGameDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Enter game information");
         LayoutInflater inflater = LeagueOptionsActivity.this.getLayoutInflater();
@@ -118,24 +117,19 @@ public class LeagueOptionsActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 Dialog d = (Dialog) dialog;
-                String teamAText = ((EditText)d.findViewById(R.id.teamA_text)).getText().toString().trim();
-                String teamBText = ((EditText)d.findViewById(R.id.teamB_text)).getText().toString().trim();
-                String daysText = ((EditText)d.findViewById(R.id.time_remaining_text)).getText().toString().trim();
-                int days = Integer.parseInt(daysText);
-                String leagueID = mLeague.getLeagueID();
-                Log.d("PickEm", "YEET:" + leagueID);
 
-                Game newGame = new Game(teamAText, teamBText, leagueID);
-                Date now = new Date();
-                Date lockTime = new Date();
-                lockTime.setTime(now.getTime() + 86400000L * (long)days);
-                newGame.setLockTime(lockTime);
-                if (auth.getUid().equals(mLeague.getLeagueOwnerUID())) {
-                    addGame(newGame);
+                // Only start adding game if user is league owner
+                if (FirebaseAuth.getInstance().getUid().equals(mLeague.getLeagueOwnerUID())) {
+                    // Get game info from edit texts
+                    String teamAText = ((EditText)d.findViewById(R.id.teamA_text)).getText().toString().trim();
+                    String teamBText = ((EditText)d.findViewById(R.id.teamB_text)).getText().toString().trim();
+                    String daysText = ((EditText)d.findViewById(R.id.time_remaining_text)).getText().toString().trim();
+
+                    // Add the game
+                    mLeague.addGame(teamAText, teamBText, daysText);
                 } else {
                     Toast.makeText(LeagueOptionsActivity.this, "Only the owner can make a game!", Toast.LENGTH_SHORT).show();
                 }
-
             }
         })
         .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -146,12 +140,6 @@ public class LeagueOptionsActivity extends AppCompatActivity {
         });
 
         return builder.create();
-    }
-
-    protected void addGame(Game gameIn) {
-        DatabaseReference tempReference = gameDatabaseReference.push();
-        gameIn.setGameID(tempReference.getKey());
-        tempReference.setValue(gameIn);
     }
 
     protected AlertDialog createDeleteLeagueDialog() {

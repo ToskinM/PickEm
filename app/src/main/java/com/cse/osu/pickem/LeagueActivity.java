@@ -4,7 +4,6 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
@@ -24,16 +23,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 public class LeagueActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -108,7 +97,8 @@ public class LeagueActivity extends AppCompatActivity
                     }
 
                     String name = leagueNameTextField.getText().toString().trim();
-                    League.createLeague(id, name, auth.getUid());
+                    League newLeague = new League(name, id, auth.getUid());
+                    newLeague.addToDatabase();
                 } else {
                     //Error handling
                     AlertDialog alertDialog = new AlertDialog.Builder(LeagueActivity.this).create();
@@ -144,7 +134,7 @@ public class LeagueActivity extends AppCompatActivity
         });
     }
 
-    // Depreciated, kept for prosperity
+    // Depreciated, kept for prosperity or later reuse
     private AlertDialog createCreateLeagueDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(LeagueActivity.this);
         // Get the layout inflater
@@ -166,7 +156,8 @@ public class LeagueActivity extends AppCompatActivity
                         String leagueName = leagueNameEditText.getText().toString().trim();
 
                         if (!leagueID.equals("")) {
-                            League.createLeague(leagueID, leagueName, auth.getUid());
+                            League newLeague = new League(leagueName, leagueID, auth.getUid());
+                            newLeague.addToDatabase();
                         } else {
                             //Error handling
                             AlertDialog alertDialog = new AlertDialog.Builder(LeagueActivity.this).create();
@@ -182,7 +173,7 @@ public class LeagueActivity extends AppCompatActivity
                 });
         return builder.create();
     }
-    // Depreciated, kept for prosperity
+    // Depreciated, kept for prosperity or later reuse
     private AlertDialog createJoinLeagueDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(LeagueActivity.this);
         // Get the layout inflater
