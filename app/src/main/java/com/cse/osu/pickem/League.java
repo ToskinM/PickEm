@@ -181,4 +181,12 @@ public class League implements Parcelable {
         if (okToAdd)
             leagueMemberDatabaseReference.push().setValue(pairToAdd);
     }
+
+    public static void createLeague(final String leagueID, final String leagueName, final String ownerID){
+        League newLeague = new League(leagueName, leagueID, ownerID);
+        // Add the league
+        FirebaseDatabase.getInstance().getReference("leagues").child(leagueID).setValue(newLeague);
+        // Add owner to league
+        FirebaseDatabase.getInstance().getReference("leagueMembers").push().setValue(new LeagueMemberPair(ownerID, leagueID));
+    }
 }
