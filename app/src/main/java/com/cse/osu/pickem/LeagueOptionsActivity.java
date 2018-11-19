@@ -33,15 +33,11 @@ public class LeagueOptionsActivity extends AppCompatActivity {
 
     public static final String TAG = "LeagueOptionsActivity";
 
-    private Button addGameButton;
-    private Button renameLeagueButton;
-    private Button deleteLeagueButton;
     private AlertDialog renameDialog;
     private AlertDialog deleteDialog;
 
     private DatabaseReference leagueDatabaseReference;
     private DatabaseReference leagueMembersDatabaseReference;
-    private DatabaseReference gameDatabaseReference;
     private FirebaseAuth auth;
     private League mLeague;
 
@@ -56,7 +52,6 @@ public class LeagueOptionsActivity extends AppCompatActivity {
         // Get Firebase Database references
         leagueDatabaseReference = FirebaseDatabase.getInstance().getReference("leagues");
         leagueMembersDatabaseReference = FirebaseDatabase.getInstance().getReference("leagueMembers");
-        gameDatabaseReference = FirebaseDatabase.getInstance().getReference("games");
         auth = FirebaseAuth.getInstance();
 
         setContentView(R.layout.activity_league_options);
@@ -74,13 +69,32 @@ public class LeagueOptionsActivity extends AppCompatActivity {
                     .commit();
         }
 
-        // Setup Dialogs
-        setupAddGameButton();
-        setupRenameLeagueButton();
+        // Setup Buttons and Dialogs
+        setupButtons();
         renameDialog = createRenameDialog();
         deleteDialog = createDeleteLeagueDialog();
 
-        deleteLeagueButton = findViewById(R.id.buttonDeleteLeague);
+        // Display league's name at the top
+        TextView leagueNameTextView = findViewById(R.id.textViewLeagueName);
+        leagueNameTextView.setText(mLeague.getLeagueName());
+
+        // Setup toolbar
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+    }
+
+    protected void setupButtons() {
+        // Add Game
+        Button addGameButton = findViewById(R.id.buttonAddGame);
+        addGameButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                createAddGameDialog().show();
+            }
+        });
+
+        // Delete League
+        Button deleteLeagueButton = findViewById(R.id.buttonDeleteLeague);
         deleteLeagueButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -96,25 +110,20 @@ public class LeagueOptionsActivity extends AppCompatActivity {
             }
         });
 
-        // Display league's name at the top
-        TextView leagueNameTextView = findViewById(R.id.textViewLeagueName);
-        leagueNameTextView.setText(mLeague.getLeagueName());
-
-        // Setup toolbar
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-    }
-
-    protected void setupAddGameButton() {
-        addGameButton = findViewById(R.id.buttonAddGame);
-        addGameButton.setOnClickListener(new View.OnClickListener() {
+        // Rename League
+        // Build the confirmation dialog once, ahead of time
+        final AlertDialog renameDialog = createRenameDialog();
+        // Wire button to show dialog
+        Button renameLeagueButton = findViewById(R.id.buttonRenameLeague);
+        renameLeagueButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                addGameDialog().show();
+                renameDialog.show();
             }
         });
     }
-    private AlertDialog addGameDialog() {
+
+    private AlertDialog createAddGameDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Enter game information");
         LayoutInflater inflater = LeagueOptionsActivity.this.getLayoutInflater();
@@ -148,38 +157,6 @@ public class LeagueOptionsActivity extends AppCompatActivity {
         return builder.create();
     }
 
-    protected AlertDialog createDeleteLeagueDialog() {
-        // Build the confirmation dialog once, ahead of time
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Are you sure about that?")
-                .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-                        deleteLeague();
-                    }
-                })
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        // Do nothing, cancelling delete
-                    }
-                });
-        return builder.create();
-    }
-
-    protected void setupRenameLeagueButton() {
-        // Build the confirmation dialog once, ahead of time
-        final AlertDialog renameDialog = createRenameDialog();
-
-        // Wire button to show dialog
-        renameLeagueButton = findViewById(R.id.buttonRenameLeague);
-        renameLeagueButton.setOnClickListener(new View.OnClickListener() {
-           @Override
-           public void onClick(View v) {
-               renameDialog.show();
-           }
-        });
-    }
-
     private AlertDialog createRenameDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(LeagueOptionsActivity.this);
         // Get the layout inflater
@@ -208,6 +185,24 @@ public class LeagueOptionsActivity extends AppCompatActivity {
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         // Do nothing, cancelling rename
+                    }
+                });
+        return builder.create();
+    }
+
+    protected AlertDialog createDeleteLeagueDialog() {
+        // Build the confirmation dialog once, ahead of time
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Are you sure about that?")
+                .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        deleteLeague();
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        // Do nothing, cancelling delete
                     }
                 });
         return builder.create();
@@ -303,8 +298,6 @@ public class LeagueOptionsActivity extends AppCompatActivity {
         });
     }
 
-
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -316,7 +309,7 @@ public class LeagueOptionsActivity extends AppCompatActivity {
         int id = item.getItemId();
         switch (id){
             case R.id.action_addGame:
-                addGameDialog().show();
+                createAddGameDialog().show();
                 return true;
             case  R.id.action_rename:
                 renameDialog.show();
