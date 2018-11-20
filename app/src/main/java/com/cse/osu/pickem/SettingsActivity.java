@@ -12,7 +12,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.graphics.Color;
@@ -25,7 +24,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-public class Settings extends AppCompatActivity
+public class SettingsActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
 
     public static final String TAG = "PickEm";
@@ -37,37 +36,37 @@ public class Settings extends AppCompatActivity
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.d(TAG, "Settings: onDestroy() called!");
+        Log.d(TAG, "SettingsActivity: onDestroy() called!");
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        Log.d(TAG, "Settings: onResume() called!");
+        Log.d(TAG, "SettingsActivity: onResume() called!");
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        Log.d(TAG, "Settings: onStart() called!");
+        Log.d(TAG, "SettingsActivity: onStart() called!");
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        Log.d(TAG, "Settings: onStop() called!");
+        Log.d(TAG, "SettingsActivity: onStop() called!");
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        Log.d(TAG, "Settings: onPause() called!");
+        Log.d(TAG, "SettingsActivity: onPause() called!");
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(TAG, "Settings: onCreate() called!");
+        Log.d(TAG, "SettingsActivity: onCreate() called!");
         setContentView(R.layout.activity_settings);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -121,7 +120,7 @@ public class Settings extends AppCompatActivity
             Intent intent = new Intent(this, PeopleActivity.class);
             startActivity(intent);
         } else if (id == R.id.nav_settings) {
-            Intent intent = new Intent(this, Settings.class);
+            Intent intent = new Intent(this, SettingsActivity.class);
             startActivity(intent);
         }
 

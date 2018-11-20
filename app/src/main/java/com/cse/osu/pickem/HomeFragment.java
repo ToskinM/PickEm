@@ -58,6 +58,7 @@ public class HomeFragment extends Fragment {
 
         // Setup recycler view
         mGameRecyclerView = view.findViewById(R.id.game_recycler_view);
+        mGameRecyclerView.setHasFixedSize(true);
         mGameRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         //mGameRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity()));
 

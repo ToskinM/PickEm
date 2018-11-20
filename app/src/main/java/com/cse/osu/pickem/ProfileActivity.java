@@ -260,7 +260,6 @@ public class ProfileActivity extends AppCompatActivity {
                         EditText newNameEditText = d.findViewById(R.id.new_username);
                         String newName = newNameEditText.getText().toString().trim();
 
-                        // Rename the league
                         changeUsername(newName);
                     }
                 })
