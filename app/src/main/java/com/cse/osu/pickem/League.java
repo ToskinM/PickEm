@@ -274,4 +274,9 @@ public class League implements Parcelable {
         newGame.setGameID(tempReference.getKey());
         tempReference.setValue(newGame);
     }
+
+    public void renameLeague(String newName) {
+        leagueName = newName;
+        FirebaseDatabase.getInstance().getReference("leagues").child(leagueID).child("leagueName").setValue(newName);
+    }
 }

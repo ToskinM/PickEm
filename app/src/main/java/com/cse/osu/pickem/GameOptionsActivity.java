@@ -78,6 +78,10 @@ public class GameOptionsActivity extends AppCompatActivity {
         pickDatabaseReference = FirebaseDatabase.getInstance().getReference("picks");
         auth = FirebaseAuth.getInstance();
 
+        pickToPickID = new HashMap<>();
+        //Load picks into local data structure for less garbage code below <3
+        updatePickMap(pickToPickID);
+
         addPickButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -86,9 +90,9 @@ public class GameOptionsActivity extends AppCompatActivity {
                 } else {
                     Toast.makeText(GameOptionsActivity.this, "Picking for this game is closed!", Toast.LENGTH_SHORT).show();
                 }
-
             }
         });
+
         editPickButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -97,19 +101,15 @@ public class GameOptionsActivity extends AppCompatActivity {
                 } else {
                     Toast.makeText(GameOptionsActivity.this, "Picking for this game is closed!", Toast.LENGTH_SHORT).show();
                 }
-
             }
         });
+
         endGameButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 endGameDialog.show();
             }
         });
-        pickToPickID = new HashMap<>();
-
-        //Load picks into local data structure for less garbage code below <3
-        updatePickMap(pickToPickID);
     }
 
     protected void updatePickMap(final Map<Pick, String> pickToPickIDIn) {
@@ -126,10 +126,7 @@ public class GameOptionsActivity extends AppCompatActivity {
                         pickToPickIDIn.put(pick, pickKey);
                     }
                 }
-
-
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
 

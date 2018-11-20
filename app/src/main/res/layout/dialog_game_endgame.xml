@@ -8,24 +8,18 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Final Score:"
-            android:textSize="25sp" />
-
         <EditText
             android:id="@+id/teamA_actualScore_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Team A actual score: "
+            android:hint="Team A Final Score: "
             android:inputType="number" />
 
         <EditText
             android:id="@+id/teamB_actualScore_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Team B actual score: "
+            android:hint="Team B Final Score: "
             android:inputType="number" />
 
     </LinearLayout>

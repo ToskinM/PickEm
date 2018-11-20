@@ -12,6 +12,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -22,6 +23,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.util.NumberUtils;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -142,8 +144,16 @@ public class LeagueOptionsActivity extends AppCompatActivity {
                 String teamBText = ((EditText)d.findViewById(R.id.teamB_text)).getText().toString().trim();
                 String daysText = ((EditText)d.findViewById(R.id.time_remaining_text)).getText().toString().trim();
 
-                // Add the game
-                mLeague.addGame(teamAText, teamBText, daysText);
+                if (!teamAText.equals("") && !teamBText.equals("") && !daysText.equals("") && TextUtils.isDigitsOnly(daysText)) {
+                    // Add the game
+                    mLeague.addGame(teamAText, teamBText, daysText);
+                    Snackbar.make(LeagueOptionsActivity.this.findViewById(android.R.id.content), "Game added", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
+                } else {
+                    AlertDialog alertDialog = new AlertDialog.Builder(LeagueOptionsActivity.this).create();
+                    alertDialog.setMessage("All teams must have names and an pick duration must be specified.");
+                    alertDialog.show();
+                }
             }
         })
         .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -174,7 +184,9 @@ public class LeagueOptionsActivity extends AppCompatActivity {
                         String newName = newNameEditText.getText().toString().trim();
 
                         // Rename the league
-                        renameLeague(mLeague.getLeagueID(), newName);
+                        mLeague.renameLeague(newName);
+                        TextView nameText = findViewById(R.id.textViewLeagueName);
+                        nameText.setText(mLeague.getLeagueName());
 
                         // Tell user league was renamed successfully
                         Snackbar.make(LeagueOptionsActivity.this.findViewById(android.R.id.content), "Rename Successful", Snackbar.LENGTH_LONG)

@@ -72,10 +72,6 @@ public class LeagueActivity extends AppCompatActivity
         handleCreateLeagueButton();
         handleJoinLeagueButton();
         handleLeaveLeagueButton();
-
-        // Have yourLeaguesTextView display user's id
-        TextView yourLeaguesTextView = findViewById(R.id.yourLeaguesTextView);
-        yourLeaguesTextView.setText("Your UID: " + auth.getUid());
     }
 
     private void handleCreateLeagueButton() {
