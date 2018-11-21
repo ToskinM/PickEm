@@ -78,7 +78,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     public void loginUser() {
         String emailText = email.getText().toString().trim();
-        String passwordText = password.getText().toString().trim();
 
         if (emailText.isEmpty()) {
             //Email is empty!
@@ -86,13 +85,13 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             return;
         }
 
-        if (passwordText.isEmpty()) {
+        if (password.getText().toString().trim().length() == 0) {
             //Password is empty!
             Toast.makeText(this, "Email empty!", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        auth.signInWithEmailAndPassword(emailText, passwordText)
+        auth.signInWithEmailAndPassword(emailText, password.getText().toString().trim())
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
@@ -108,7 +107,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     public void registerUser() {
         String emailText = email.getText().toString().trim();
-        String passwordText = password.getText().toString().trim();
 
         if (emailText.isEmpty()) {
             //Email is empty!
@@ -116,13 +114,13 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             return;
         }
 
-        if (passwordText.isEmpty()) {
+        if (password.getText().toString().trim().length() == 0) {
             //Password is empty!
             Toast.makeText(this, "Password empty!", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        auth.createUserWithEmailAndPassword(emailText, passwordText).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+        auth.createUserWithEmailAndPassword(emailText, password.getText().toString().trim()).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()) {

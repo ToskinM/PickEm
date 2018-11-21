@@ -5,6 +5,7 @@ import android.content.Intent;
 import org.junit.Rule;
 import org.junit.Test;
 
+import java.util.Date;
 import java.util.Random;
 
 import androidx.test.espresso.Espresso;
@@ -19,8 +20,8 @@ public class GameNameTest {
     private String TEST_FIREBASE_PASSWORD = "password";
 
     @Rule
-    public ActivityTestRule<GameOptionsActivity> mActivityRule =
-            new ActivityTestRule<>(GameOptionsActivity.class);
+    public ActivityTestRule<HomeActivity> mActivityRule =
+            new ActivityTestRule<>(HomeActivity.class);
 
     // Ensure league name is properly displayed in the League's options.
     @Test
@@ -31,6 +32,7 @@ public class GameNameTest {
         String espressoLeagueID = "EspressoLeagueID-" + new Random().nextInt(1000);
         Intent intent = new Intent(mActivityRule.getActivity(), GameOptionsActivity.class);
         Game game = new Game(espressoFirstName, espressoSecondName, espressoLeagueID);
+        game.setLockTime(new Date(new Date().getTime() + 10000));
         intent.putExtra("game", game);
         mActivityRule.getActivity().startActivity(intent);
 
