@@ -69,7 +69,6 @@ public class ProfileActivity extends AppCompatActivity {
         setupButtonListeners();
 
         updateProfileInfo();
-
     }
 
     protected void setupButtonListeners() {
@@ -178,7 +177,7 @@ public class ProfileActivity extends AppCompatActivity {
             String imageEncoded = Base64.encodeToString(baos.toByteArray(), Base64.DEFAULT);
             profileDatabaseReference
                     .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                    .child("encodedProflePicture")
+                    .child("encodedProfilePicture")
                     .setValue(imageEncoded);
         }
     }
@@ -226,9 +225,12 @@ public class ProfileActivity extends AppCompatActivity {
                     Profile tempProfile = snapshot.getValue(Profile.class);
                     if (tempProfile.getUserID().equals(auth.getUid())) {
                         // Get and decode profile image
-                        byte[] decodedByteArray = android.util.Base64.decode(tempProfile.getEncodedProfilePicture(), Base64.DEFAULT);
-                        profilePhoto = BitmapFactory.decodeByteArray(decodedByteArray, 0, decodedByteArray.length);
-                        profileImageView.setImageBitmap(profilePhoto);
+                        String profilePic = tempProfile.getEncodedProfilePicture();
+                        if (profilePic != null){
+                            byte[] decodedByteArray = android.util.Base64.decode(profilePic, Base64.DEFAULT);
+                            profilePhoto = BitmapFactory.decodeByteArray(decodedByteArray, 0, decodedByteArray.length);
+                            profileImageView.setImageBitmap(profilePhoto);
+                        }
 
                         // Display Username
                         userNameTextView.setText(tempProfile.getUserName());

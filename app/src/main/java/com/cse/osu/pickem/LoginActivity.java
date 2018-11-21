@@ -96,6 +96,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
+                            checkForUserProfile();
                             finish();
                             startActivity(new Intent(getApplicationContext(), HomeActivity.class));
                         } else {
