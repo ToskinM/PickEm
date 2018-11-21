@@ -13,6 +13,14 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/gameTitleView"
+            android:text="placeholder"
+            android:gravity="center"
+            android:textSize="20sp"/>
+
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

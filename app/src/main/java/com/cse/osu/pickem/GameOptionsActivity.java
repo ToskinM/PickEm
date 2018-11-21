@@ -19,6 +19,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -65,6 +66,8 @@ public class GameOptionsActivity extends AppCompatActivity {
         Intent creatorIntent = getIntent();
         mGame = creatorIntent.getParcelableExtra("game");
         setTitle(mGame.getFirstTeamName() + " vs. " + mGame.getSecondTeamName());
+        TextView titleView = findViewById(R.id.gameTitleView);
+        titleView.setText(mGame.getFirstTeamName() + " vs. " + mGame.getSecondTeamName());
 
         addPickButton = findViewById(R.id.buttonMakePick);
         endGameButton = findViewById(R.id.buttonEndGame);
