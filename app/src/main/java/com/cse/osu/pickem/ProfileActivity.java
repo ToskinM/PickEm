@@ -11,7 +11,6 @@ import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -227,7 +226,7 @@ public class ProfileActivity extends AppCompatActivity {
                     Profile tempProfile = snapshot.getValue(Profile.class);
                     if (tempProfile.getUserID().equals(auth.getUid())) {
                         // Get and decode profile image
-                        byte[] decodedByteArray = android.util.Base64.decode(tempProfile.getEncodedProflePicture(), Base64.DEFAULT);
+                        byte[] decodedByteArray = android.util.Base64.decode(tempProfile.getEncodedProfilePicture(), Base64.DEFAULT);
                         profilePhoto = BitmapFactory.decodeByteArray(decodedByteArray, 0, decodedByteArray.length);
                         profileImageView.setImageBitmap(profilePhoto);
 

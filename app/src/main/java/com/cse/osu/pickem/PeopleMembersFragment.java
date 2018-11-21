@@ -150,7 +150,7 @@ public class PeopleMembersFragment extends Fragment {
                         if (profile.getUserID().equals(uid)) {
                             memberUsername = profile.getUserName();
                             mUsernameTextView.setText(memberUsername);
-                            memberProfilePic = profile.getEncodedProflePicture();
+                            memberProfilePic = profile.getEncodedProfilePicture();
                             return;
                         }
                     }

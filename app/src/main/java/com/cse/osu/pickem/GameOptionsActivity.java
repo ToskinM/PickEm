@@ -260,7 +260,7 @@ public class GameOptionsActivity extends AppCompatActivity {
                         EditText actualBScore = d.findViewById(R.id.teamB_actualScore_text);
                         int aScore = Integer.parseInt(actualAScore.getText().toString().trim());
                         int bScore = Integer.parseInt(actualBScore.getText().toString().trim());
-                        mGame.endGame(mGame.getGameID(), aScore, bScore);
+                        mGame.fastEndGame(aScore, bScore);
                         finish();
                     }
                 })

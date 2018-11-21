@@ -44,36 +44,40 @@ public class Game implements Parcelable {
         this.leagueID = leagueID;
     }
 
-    public void endGame(final String gameID, final int teamAFinalScore, final int teamBFinalScore) {
-        picksReference = FirebaseDatabase.getInstance().getReference("picks");
-        leagueMemberReference = FirebaseDatabase.getInstance().getReference("leagueMembers");
-
+    public void fastEndGame(final int teamAFinalScore, final int teamBFinalScore) {
         DatabaseReference leagueReference = FirebaseDatabase.getInstance().getReference("leagues");
+        leagueReference = leagueReference.child(leagueID).child("leagueOwnerUID");
         leagueReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    League testLeague = snapshot.getValue(League.class);
-                    if (testLeague.getLeagueOwnerUID().equals(auth.getUid()) && leagueID.equals(testLeague.getLeagueID())) {
-                        picksReference.addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                                    Pick tempPick = snapshot.getValue(Pick.class);
+                String leagueOwnerID = dataSnapshot.getValue(String.class);
+
+                if (!auth.getUid().equals(leagueOwnerID)) {
+                    Log.d("PickEm", "Not the owner!!");
+                } else {
+                    picksReference = FirebaseDatabase.getInstance().getReference("picks");
+                    picksReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                            for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                                Pick tempPick = snapshot.getValue(Pick.class);
+                                if (tempPick.getGameID().equals(gameID)) {
                                     calculatePoints(tempPick, teamAFinalScore, teamBFinalScore);
                                     DatabaseReference gamesReference = FirebaseDatabase.getInstance().getReference("games");
                                     gamesReference = gamesReference.child(gameID);
                                     gamesReference.removeValue();
                                     removePicks();
                                 }
-                            }
-
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError databaseError) {
 
                             }
-                        });
-                    }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
                 }
             }
 
@@ -82,9 +86,6 @@ public class Game implements Parcelable {
 
             }
         });
-
-
-
     }
 
     // Removes all picks for this game
@@ -130,7 +131,7 @@ public class Game implements Parcelable {
 
         final int finalNewPoints = pointsWon;
         final String leagueIDFinal = leagueID;
-
+        leagueMemberReference = FirebaseDatabase.getInstance().getReference("leagueMembers");
         leagueMemberReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
