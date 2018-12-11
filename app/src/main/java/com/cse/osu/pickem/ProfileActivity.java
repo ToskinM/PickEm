@@ -57,9 +57,11 @@ public class ProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_profile);
         setTitle("Your Profile");
 
+
         // Init database refs
         auth = FirebaseAuth.getInstance();
         profileDatabaseReference = FirebaseDatabase.getInstance().getReference("profiles");
+
 
         // Wire up views
         profileImageView = findViewById(R.id.imageView_profilePic);
