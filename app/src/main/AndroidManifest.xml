@@ -22,6 +22,10 @@
         android:theme="@style/AppTheme.NoActionBar" />
         ]]>
         <activity
+            android:name=".MainActivity"
+            android:label="Main"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
             android:name=".HomeActivity"
             android:label="@string/title_activity_home"
             android:theme="@style/AppTheme.NoActionBar" />
@@ -32,13 +36,13 @@
         <activity
             android:name=".PeopleActivity"
             android:label="@string/title_activity_people"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:screenOrientation="locked" />
+            android:screenOrientation="locked"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".LoginActivity"
             android:label="@string/title_activity_login"
@@ -69,7 +73,8 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
-        <activity android:name=".PeopleMembersActivity"></activity>
+        <activity android:name=".PeopleMembersActivity" />
+
     </application>
 
 </manifest>
