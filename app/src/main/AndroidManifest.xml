@@ -26,24 +26,6 @@
             android:label="Main"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".HomeActivity"
-            android:label="@string/title_activity_home"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".LeagueActivity"
-            android:label="@string/title_activity_leagues"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".PeopleActivity"
-            android:label="@string/title_activity_people"
-            android:screenOrientation="locked"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".SettingsActivity"
-            android:label="@string/title_activity_settings"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
             android:name=".LoginActivity"
             android:label="@string/title_activity_login"
             android:theme="@style/AppTheme.NoActionBar">
