@@ -4,53 +4,87 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorBackgroundDark"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".LeagueOptionsActivity"
     tools:showIn="@layout/activity_league_options">
 
-    <LinearLayout
-        android:id="@+id/linearLayout2"
+    <TextView
+        android:id="@+id/textViewLeagueName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:textAllCaps="true"
+        android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+        android:textColor="@color/common_google_signin_btn_text_dark_default"
+        android:textStyle="bold"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="League Name" />
 
-        <TextView
-            android:id="@+id/textViewLeagueName"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:textSize="25sp"
-            tools:text="League Name" />
+    <View
+        android:id="@+id/divider"
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/mr_dialog_material_background_light"
+        app:layout_constraintTop_toBottomOf="@+id/textViewLeagueName" />
 
-        <Button
-            android:id="@+id/buttonAddGame"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Add Game" />
-
-        <Button
-            android:id="@+id/buttonRenameLeague"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/rename_league" />
-
-        <Button
-            android:id="@+id/buttonDeleteLeague"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/delete_league"
-            android:textColor="@android:color/holo_red_dark" />
-
-    </LinearLayout>
+    <View
+        android:id="@+id/divider3"
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/mr_dialog_material_background_light"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout2" />
 
     <FrameLayout
         android:id="@+id/fragment_container"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout2">
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/divider3"
+        app:layout_constraintTop_toBottomOf="@+id/divider">
 
     </FrameLayout>
+
+    <LinearLayout
+        android:id="@+id/linearLayout2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="32dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <Button
+            android:id="@+id/buttonAddGame"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Add Game"
+            android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+            android:textColor="@color/common_google_signin_btn_text_dark_default" />
+
+        <Button
+            android:id="@+id/buttonRenameLeague"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/rename_league"
+            android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+            android:textColor="@color/common_google_signin_btn_text_dark_default" />
+
+        <Button
+            android:id="@+id/buttonDeleteLeague"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/delete_league"
+            android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+            android:textColor="@android:color/holo_red_light" />
+
+    </LinearLayout>
 
 
 </android.support.constraint.ConstraintLayout>

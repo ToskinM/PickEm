@@ -38,8 +38,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
-
         auth = FirebaseAuth.getInstance();
         profilesDatabaseReference = FirebaseDatabase.getInstance().getReference("profiles");
 
@@ -50,7 +48,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+        setContentView(R.layout.content_login);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
