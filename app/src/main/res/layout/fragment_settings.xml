@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorBackgroundDark"
     android:orientation="vertical">
 
     <TextView
@@ -13,11 +14,11 @@
         android:textColor="@color/common_google_signin_btn_text_dark_default" />
 
     <Button
+        android:id="@+id/button_logOut"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/button_logOut"
         android:layout_margin="15dp"
-        android:id="@+id/button_logOut"/>
+        android:text="@string/button_logOut" />
 
     <Button
         android:id="@+id/button_myProfile"
@@ -27,10 +28,10 @@
         android:text="@string/button_myProfile" />
 
     <Button
+        android:id="@+id/button_deleteAccount"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/button_deleteAccount"
         android:layout_margin="15dp"
-        android:id="@+id/button_deleteAccount"/>
+        android:text="@string/button_deleteAccount" />
 
 </LinearLayout>
