@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorBackgroundDark">
+
+    <LinearLayout
+        android:id="@+id/linearLayout5"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="32dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <EditText
+            android:id="@+id/league_id_field"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/common_google_signin_btn_text_dark_default"
+            android:hint="League ID"
+            android:inputType="text"
+            android:textColor="@color/common_google_signin_btn_text_dark_default"
+            android:textColorHint="@color/common_google_signin_btn_text_dark_default" />
+
+        <EditText
+            android:id="@+id/league_name_field"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/common_google_signin_btn_text_dark_default"
+            android:hint="League Name"
+            android:inputType="text|textCapWords|textAutoCorrect|textAutoComplete"
+            android:textColor="@color/common_google_signin_btn_text_dark_default"
+            android:textColorHint="@color/common_google_signin_btn_text_dark_default" />
+
+        <Button
+            android:id="@+id/buttonCreateLeague"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Create League"
+            android:textAlignment="center"
+            android:textAllCaps="true"
+            android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+            android:textColor="@color/common_google_signin_btn_text_dark_default" />
+
+        <Button
+            android:id="@+id/buttonJoinLeague"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Join League"
+            android:textAlignment="center"
+            android:textAllCaps="true"
+            android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+            android:textColor="@color/common_google_signin_btn_text_dark_default" />
+
+        <Button
+            android:id="@+id/buttonLeaveLeague"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Leave League"
+            android:textAlignment="center"
+            android:textAllCaps="true"
+            android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+            android:textColor="@color/common_google_signin_btn_text_dark_default" />
+
+
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout5"
+        app:layout_constraintTop_toTopOf="parent">
+
+    </FrameLayout>
+
+
+</android.support.constraint.ConstraintLayout>

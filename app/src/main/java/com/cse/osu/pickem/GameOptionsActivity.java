@@ -58,7 +58,7 @@ public class GameOptionsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_game_options);
+        setContentView(R.layout.content_game_options);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -66,13 +66,30 @@ public class GameOptionsActivity extends AppCompatActivity {
         Intent creatorIntent = getIntent();
         mGame = creatorIntent.getParcelableExtra("game");
         setTitle(mGame.getFirstTeamName() + " vs. " + mGame.getSecondTeamName());
-        TextView titleView = findViewById(R.id.gameTitleView);
-        titleView.setText(mGame.getFirstTeamName() + " vs. " + mGame.getSecondTeamName());
+        ((TextView)findViewById(R.id.Team1_Name)).setText(mGame.getFirstTeamName());
+        ((TextView)findViewById(R.id.Team2_Name)).setText(mGame.getSecondTeamName());
 
         addPickButton = findViewById(R.id.buttonMakePick);
         endGameButton = findViewById(R.id.buttonEndGame);
         editPickButton = findViewById(R.id.buttonEditPick);
 
+        DatabaseReference leagueReference = FirebaseDatabase.getInstance().getReference("leagues").child(mGame.getLeagueID()).child("leagueOwnerUID");
+        leagueReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                String leagueOwnerID = dataSnapshot.getValue(String.class);
+
+                if (!auth.getUid().equals(leagueOwnerID)) {
+                    endGameButton.setEnabled(false);
+                    endGameButton.setTextColor(getResources().getColor(R.color.colorDisabledText));
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
 
         addPickDialog = addPickDialog();
         endGameDialog = endGameDialog();
@@ -82,30 +99,37 @@ public class GameOptionsActivity extends AppCompatActivity {
         auth = FirebaseAuth.getInstance();
 
         pickToPickID = new HashMap<>();
+
         //Load picks into local data structure for less garbage code below <3
         updatePickMap(pickToPickID);
 
-        addPickButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!mGame.isPastLockTime()) {
-                    addPickDialog.show();
-                } else {
-                    Toast.makeText(GameOptionsActivity.this, "Picking for this game is closed!", Toast.LENGTH_SHORT).show();
+        if (mGame.isPastLockTime()) {
+            addPickButton.setEnabled(false);
+            editPickButton.setEnabled(false);
+            addPickButton.setTextColor(getResources().getColor(R.color.colorDisabledText));
+            editPickButton.setTextColor(getResources().getColor(R.color.colorDisabledText));
+        } else {
+            addPickButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (!mGame.isPastLockTime()) {
+                        addPickDialog.show();
+                    } else {
+                        Toast.makeText(GameOptionsActivity.this, "Picking for this game is closed!", Toast.LENGTH_SHORT).show();
+                    }
                 }
-            }
-        });
-
-        editPickButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!mGame.isPastLockTime()) {
-                    editPickDialog.show();
-                } else {
-                    Toast.makeText(GameOptionsActivity.this, "Picking for this game is closed!", Toast.LENGTH_SHORT).show();
+            });
+            editPickButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (!mGame.isPastLockTime()) {
+                        editPickDialog.show();
+                    } else {
+                        Toast.makeText(GameOptionsActivity.this, "Picking for this game is closed!", Toast.LENGTH_SHORT).show();
+                    }
                 }
-            }
-        });
+            });
+        }
 
         endGameButton.setOnClickListener(new View.OnClickListener() {
             @Override

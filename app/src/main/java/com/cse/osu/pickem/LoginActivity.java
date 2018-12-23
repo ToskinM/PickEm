@@ -38,18 +38,17 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         auth = FirebaseAuth.getInstance();
         profilesDatabaseReference = FirebaseDatabase.getInstance().getReference("profiles");
 
         if (auth.getCurrentUser() != null) {
             checkForUserProfile();
             finish();
-            startActivity(new Intent(getApplicationContext(), HomeActivity.class));
+            startActivity(new Intent(getApplicationContext(), MainActivity.class));
         }
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+        setContentView(R.layout.content_login);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -98,7 +97,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                         if (task.isSuccessful()) {
                             checkForUserProfile();
                             finish();
-                            startActivity(new Intent(getApplicationContext(), HomeActivity.class));
+                            startActivity(new Intent(getApplicationContext(), MainActivity.class));
                         } else {
                             Toast.makeText(LoginActivity.this, "Incorrect Email or Password!", Toast.LENGTH_SHORT).show();
                         }

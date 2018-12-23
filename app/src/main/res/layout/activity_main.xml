@@ -9,7 +9,7 @@
     tools:openDrawer="start">
 
     <include
-        layout="@layout/app_bar_people"
+        layout="@layout/app_bar_main"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
@@ -18,8 +18,11 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
+        android:background="@color/colorBackgroundDark"
         android:fitsSystemWindows="true"
-        app:headerLayout="@layout/nav_header_people"
-        app:menu="@menu/activity_people_drawer" />
+        app:headerLayout="@layout/nav_header_main"
+        app:itemIconTint="@color/common_google_signin_btn_text_dark_default"
+        app:itemTextColor="@color/common_google_signin_btn_text_dark_default"
+        app:menu="@menu/activity_main_drawer" />
 
 </android.support.v4.widget.DrawerLayout>

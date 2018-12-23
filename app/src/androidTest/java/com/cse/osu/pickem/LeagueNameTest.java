@@ -37,7 +37,7 @@ public class LeagueNameTest {
 
     // Ensure league name is properly displayed in the League's options.
     @Test
-    public void verifyLEagueNameDisplayed() {
+    public void verifyLeagueNameDisplayed() {
         String leagueName = "EspressoLeague-" + new Random().nextInt(1000);
         Intent intent = new Intent(mActivityRule.getActivity(), LeagueOptionsActivity.class);
         intent.putExtra("league", new League(leagueName, "EL-" + new Random().nextInt(1000), TEST_FIREBASE_UID));
