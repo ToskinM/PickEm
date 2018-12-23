@@ -38,6 +38,7 @@ public class GameListFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_game_list, container, false);
+        Context context = getActivity();
 
         // Get leagueID from launching activity
         if (getArguments() != null){
@@ -56,8 +57,10 @@ public class GameListFragment extends Fragment {
         });
 
         // Setup recycler view
-        mGameRecyclerView = view.findViewById(R.id.game_recycler_view);
-        mGameRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        if (context != null) {
+            mGameRecyclerView = view.findViewById(R.id.game_recycler_view);
+            mGameRecyclerView.setLayoutManager(new LinearLayoutManager(context));
+        }
 
         // Setup Listeners
         setupDatabaseListeners();

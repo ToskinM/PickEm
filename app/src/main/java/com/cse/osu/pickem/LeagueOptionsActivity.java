@@ -56,7 +56,7 @@ public class LeagueOptionsActivity extends AppCompatActivity {
         leagueMembersDatabaseReference = FirebaseDatabase.getInstance().getReference("leagueMembers");
         auth = FirebaseAuth.getInstance();
 
-        setContentView(R.layout.activity_league_options);
+        setContentView(R.layout.content_league_options);
 
         // Create game RecyclerView Fragment
         FragmentManager fm = getSupportFragmentManager();

@@ -12,6 +12,7 @@
         android:required="false" />
 
     <application
+        android:name=".PickEm"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -22,23 +23,9 @@
         android:theme="@style/AppTheme.NoActionBar" />
         ]]>
         <activity
-            android:name=".HomeActivity"
-            android:label="@string/title_activity_home"
+            android:name=".MainActivity"
+            android:label="Main"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".LeagueActivity"
-            android:label="@string/title_activity_leagues"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".PeopleActivity"
-            android:label="@string/title_activity_people"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:screenOrientation="locked" />
-        <activity
-            android:name=".SettingsActivity"
-            android:label="@string/title_activity_settings"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:screenOrientation="portrait"/>
         <activity
             android:name=".LoginActivity"
             android:label="@string/title_activity_login"
@@ -56,6 +43,7 @@
         <activity
             android:name=".GameOptionsActivity"
             android:label="@string/title_activity_game_options"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".ProfileActivity" />
 
@@ -69,7 +57,7 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
-        <activity android:name=".PeopleMembersActivity"></activity>
+        <activity android:name=".PeopleMembersActivity" />
     </application>
 
 </manifest>

@@ -4,24 +4,27 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorBackgroundDark"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".PeopleActivity"
-    tools:showIn="@layout/app_bar_people">
+    tools:context=".MainActivity"
+    tools:showIn="@layout/app_bar_main">
 
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/yourOwnedLeagues"
-        android:textAlignment="center"
-        android:textSize="24sp" />
+    <ImageButton
+        android:id="@+id/navButton"
+        style="@android:style/Widget.DeviceDefault.Button.Borderless"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@android:drawable/ic_menu_sort_by_size" />
 
-    <FrameLayout
+    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/fragment_container"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView2">
+        app:layout_constraintTop_toBottomOf="@+id/navButton">
 
     </FrameLayout>
+
 </android.support.constraint.ConstraintLayout>
