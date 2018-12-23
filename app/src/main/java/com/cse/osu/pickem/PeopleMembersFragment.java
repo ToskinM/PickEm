@@ -22,6 +22,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 
@@ -193,6 +195,7 @@ public class PeopleMembersFragment extends Fragment {
 
         public MemberAdapter(List<LeagueMemberPair> members) {
             mMembers = members;
+            Collections.sort(mMembers, Collections.reverseOrder(new SortByPoints()));
         }
 
         @Override
@@ -212,5 +215,11 @@ public class PeopleMembersFragment extends Fragment {
         public int getItemCount() {
             return mMembers.size();
         }
+    }
+}
+
+class SortByPoints implements Comparator<LeagueMemberPair> {
+    public int compare(LeagueMemberPair a, LeagueMemberPair b) {
+        return Integer.compare(a.getPoints(), b.getPoints());
     }
 }
