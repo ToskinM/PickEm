@@ -58,6 +58,7 @@
         </provider>
 
         <activity android:name=".PeopleMembersActivity" />
+        <activity android:name=".LeagueLeaderboard"></activity>
     </application>
 
 </manifest>

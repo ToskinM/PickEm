@@ -58,6 +58,15 @@
         app:layout_constraintBottom_toBottomOf="parent">
 
         <Button
+            android:id="@+id/viewLeagueMembers"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="View Leaderboard"
+            android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+            android:textColor="@color/common_google_signin_btn_text_dark_default"/>
+
+        <Button
             android:id="@+id/buttonAddGame"
             style="@style/Widget.AppCompat.Button.Borderless"
             android:layout_width="match_parent"
@@ -65,6 +74,8 @@
             android:text="Add Game"
             android:textAppearance="@style/TextAppearance.AppCompat.Headline"
             android:textColor="@color/common_google_signin_btn_text_dark_default" />
+
+
 
         <Button
             android:id="@+id/buttonRenameLeague"
@@ -74,6 +85,8 @@
             android:text="@string/rename_league"
             android:textAppearance="@style/TextAppearance.AppCompat.Headline"
             android:textColor="@color/common_google_signin_btn_text_dark_default" />
+
+
 
         <Button
             android:id="@+id/buttonDeleteLeague"

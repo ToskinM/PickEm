@@ -86,6 +86,18 @@ public class LeagueOptionsActivity extends AppCompatActivity {
     }
 
     protected void setupButtons() {
+        //View the leaderboards
+        Button viewLeaderboardButton = findViewById(R.id.viewLeagueMembers);
+        viewLeaderboardButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(LeagueOptionsActivity.this, LeagueLeaderboard.class);
+                intent.putExtra("league", mLeague);
+                startActivity(intent);
+            }
+        });
+
+
         // Add Game
         Button addGameButton = findViewById(R.id.buttonAddGame);
         if (!FirebaseAuth.getInstance().getUid().equals(mLeague.getLeagueOwnerUID()))

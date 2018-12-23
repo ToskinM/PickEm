@@ -177,7 +177,22 @@ public class PeopleMembersFragment extends Fragment {
             if (memberProfilePic != null && !memberProfilePic.equals(""))
                 profileImageView.setImageBitmap(Profile.getBitmapFromString(memberProfilePic));
 
-            Button removeButton = dialogView.findViewById(R.id.button_remove);
+            final Button removeButton = dialogView.findViewById(R.id.button_remove);
+            DatabaseReference leagueReference = FirebaseDatabase.getInstance().getReference("leagues").child(mLeagueID).child("leagueOwnerUID");
+            leagueReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    String leaguesOwnerID = dataSnapshot.getValue(String.class);
+                    if (!leaguesOwnerID.equals(auth.getUid())) {
+                        removeButton.setEnabled(false);
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
             removeButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
